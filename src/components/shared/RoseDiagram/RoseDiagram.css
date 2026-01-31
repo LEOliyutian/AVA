@@ -1,0 +1,21 @@
+.rose-sec {
+  stroke: #fff;
+  stroke-width: 1px;
+  transition: opacity 0.1s;
+}
+
+.rose-sec:hover {
+  opacity: 0.7;
+}
+
+.fill-base {
+  fill: #e9ecef;
+}
+
+.fill-p1 {
+  fill: #d9534f;
+}
+
+.fill-p2 {
+  fill: #f0ad4e;
+}

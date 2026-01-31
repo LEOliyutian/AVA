@@ -1,0 +1,531 @@
+.detail-page {
+  min-height: 100vh;
+  background: var(--bg-gray);
+}
+
+.detail-header {
+  background: white;
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.back-link {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.back-link:hover {
+  color: var(--accent);
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn {
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+  border: none;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #2980b9;
+}
+
+.btn-outline {
+  background: white;
+  color: var(--primary);
+  border: 1px solid #ddd;
+}
+
+.btn-outline:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btn-danger {
+  background: #d9534f;
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #c9302c;
+}
+
+.btn-export {
+  background: #27ae60;
+  color: white;
+}
+
+.btn-export:hover:not(:disabled) {
+  background: #219a52;
+}
+
+.btn-export:disabled {
+  background: #95a5a6;
+}
+
+.detail-main {
+  padding: 30px;
+  display: flex;
+  justify-content: center;
+}
+
+.report-container {
+  width: 100%;
+  max-width: 1000px;
+  background: white;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* 报告头部 */
+.rep-header {
+  background: var(--primary);
+  color: white;
+  padding: 35px 45px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.rep-brand h1 {
+  margin: 0;
+  font-size: 28px;
+  letter-spacing: 1px;
+}
+
+.rep-brand h2 {
+  margin: 8px 0 0;
+  font-size: 14px;
+  opacity: 0.85;
+  font-weight: 400;
+}
+
+.rep-meta {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.meta-date {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.meta-valid {
+  font-size: 11px;
+  opacity: 0.7;
+  text-transform: uppercase;
+}
+
+.meta-fc {
+  font-size: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.status-tag {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: 600;
+  margin-top: 5px;
+}
+
+.status-tag.status-published {
+  background: rgba(46, 204, 113, 0.3);
+  color: #fff;
+}
+
+.status-tag.status-draft {
+  background: rgba(241, 196, 15, 0.3);
+  color: #fff;
+}
+
+.status-tag.status-archived {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+/* 危险等级栏 */
+.danger-bar {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  border-bottom: 1px solid #ddd;
+}
+
+.db-cell {
+  padding: 25px 20px;
+  border-right: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.db-cell:last-child {
+  border-right: none;
+}
+
+.db-title {
+  font-size: 12px;
+  font-weight: 800;
+  color: #555;
+  text-transform: uppercase;
+}
+
+.db-elev {
+  font-size: 11px;
+  color: #999;
+  margin-bottom: 12px;
+}
+
+.db-badge {
+  width: 100%;
+  padding: 10px;
+  color: white;
+  font-weight: 700;
+  font-size: 14px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.rd-box {
+  width: 100%;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  padding: 8px;
+  margin-bottom: 10px;
+}
+
+.rd-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  line-height: 1.5;
+  margin-bottom: 2px;
+}
+
+.rd-label {
+  color: #888;
+  font-weight: 600;
+}
+
+.rd-val {
+  color: #333;
+  font-weight: 700;
+  text-align: right;
+}
+
+.db-desc {
+  font-size: 11px;
+  color: #444;
+  line-height: 1.4;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-style: italic;
+  padding: 0 5px;
+}
+
+.db-trend {
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 12px;
+}
+
+/* 主内容区 */
+.rep-content {
+  display: grid;
+  grid-template-columns: 2.1fr 1fr;
+}
+
+.col-main {
+  padding: 35px 45px;
+  border-right: 1px solid #eee;
+}
+
+.col-side {
+  padding: 35px 30px;
+  background: #fdfefe;
+}
+
+.sec-h {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--primary);
+  border-bottom: 2px solid #eee;
+  padding-bottom: 8px;
+  margin-bottom: 25px;
+  text-transform: uppercase;
+}
+
+/* 雪崩问题卡片 */
+.prob-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  margin-bottom: 25px;
+  display: flex;
+  overflow: hidden;
+}
+
+.prob-vis {
+  width: 160px;
+  background: #f8f9fa;
+  border-right: 1px solid #eee;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.tag {
+  font-size: 10px;
+  font-weight: 700;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 3px;
+  text-transform: uppercase;
+  margin-bottom: 15px;
+}
+
+.prob-sectors {
+  font-size: 11px;
+  color: #666;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.sectors-list {
+  display: block;
+}
+
+.prob-dat {
+  flex: 1;
+  padding: 20px 25px;
+}
+
+.prob-type {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 10px;
+}
+
+.prob-metrics {
+  display: flex;
+  gap: 20px;
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 15px;
+}
+
+.prob-metrics strong {
+  color: #333;
+}
+
+.prob-txt {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #555;
+  margin: 0;
+}
+
+/* 观测区块 */
+.obs-block {
+  background: #f9f9f9;
+  border-radius: 6px;
+  padding: 15px 20px;
+  margin-bottom: 15px;
+}
+
+.obs-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.obs-txt {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #444;
+}
+
+/* 摘要 */
+.sum-box {
+  background: #f9f9f9;
+  border-radius: 6px;
+  padding: 20px;
+  border-left: 4px solid var(--accent);
+  font-size: 14px;
+  line-height: 1.7;
+  color: #444;
+}
+
+/* 天气面板 */
+.wx-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.wx-tile {
+  background: #f8f9fa;
+  border-radius: 6px;
+  padding: 15px;
+  text-align: center;
+}
+
+.wx-big {
+  display: block;
+  font-size: 16px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 5px;
+  word-break: break-word;
+}
+
+.wx-sub {
+  font-size: 10px;
+  color: #888;
+  text-transform: uppercase;
+}
+
+.sn-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+}
+
+.sn-box {
+  background: #f8f9fa;
+  border-radius: 6px;
+  padding: 12px;
+  text-align: center;
+}
+
+.sn-box strong {
+  display: block;
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 3px;
+}
+
+/* 气象观测 */
+.obs-meta {
+  display: flex;
+  gap: 20px;
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 15px;
+}
+
+.station-box {
+  background: #f8f9fa;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+.station-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #555;
+  margin-bottom: 8px;
+}
+
+.station-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+  font-size: 11px;
+  color: #666;
+}
+
+/* 页脚 */
+.rep-footer {
+  background: #f5f5f5;
+  padding: 20px 45px;
+  text-align: center;
+  font-size: 11px;
+  color: #888;
+  line-height: 1.6;
+}
+
+.rep-footer p {
+  margin: 5px 0;
+}
+
+/* 状态 */
+.loading,
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  text-align: center;
+  color: #888;
+}
+
+.error-container p {
+  margin-bottom: 20px;
+}
+
+/* 响应式 */
+@media (max-width: 900px) {
+  .rep-content {
+    grid-template-columns: 1fr;
+  }
+
+  .col-main {
+    border-right: none;
+    border-bottom: 1px solid #eee;
+  }
+
+  .danger-bar {
+    grid-template-columns: 1fr;
+  }
+
+  .db-cell {
+    border-right: none;
+    border-bottom: 1px solid #eee;
+  }
+
+  .prob-card {
+    flex-direction: column;
+  }
+
+  .prob-vis {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #eee;
+  }
+}

@@ -1,0 +1,209 @@
+:root {
+  --primary: #2c3e50;
+  --accent: #3498db;
+  --bg-gray: #e9ecef;
+  --sidebar-w: 520px;
+
+  /* 国际通用危险色 */
+  --c-1: #5cb85c;
+  --c-2: #f0ad4e;
+  --c-3: #ff9800;
+  --c-4: #d9534f;
+  --c-5: #292b2c;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', 'Roboto', 'Microsoft YaHei', sans-serif;
+  background: var(--bg-gray);
+  color: #333;
+  min-height: 100vh;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+}
+
+/* 侧边栏 */
+.sidebar {
+  width: var(--sidebar-w);
+  background: white;
+  border-right: 1px solid #ccc;
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+  box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05);
+}
+
+.sidebar-header {
+  padding: 18px 25px;
+  background: var(--primary);
+  color: white;
+  border-bottom: 1px solid #1a252f;
+}
+
+.sidebar-header h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.sidebar-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 25px;
+  padding-bottom: 100px;
+}
+
+/* 表单样式 */
+.form-group {
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+
+.form-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--primary);
+  border-bottom: 2px solid #f2f2f2;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.input-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.input-item {
+  flex: 1;
+}
+
+label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+select,
+input,
+textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 12px;
+  box-sizing: border-box;
+  transition: 0.2s;
+}
+
+select:focus,
+input:focus,
+textarea:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 60px;
+  font-family: inherit;
+  line-height: 1.5;
+}
+
+/* 监控面板 */
+.monitor-box {
+  background: #f8f9fa;
+  border: 1px dashed #adb5bd;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+}
+
+.monitor-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  margin-bottom: 4px;
+  color: #555;
+}
+
+/* 玫瑰图编辑器 */
+.rose-wrap {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: #fafafa;
+  border: 1px solid #eee;
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 5px;
+}
+
+.rose-instr {
+  font-size: 10px;
+  color: #888;
+  line-height: 1.4;
+}
+
+.btn-download {
+  width: 100%;
+  padding: 18px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-download:hover {
+  background: #2980b9;
+}
+
+/* Loading */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: var(--bg-gray);
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #eee;
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-container p {
+  margin-top: 15px;
+  color: #666;
+  font-size: 14px;
+}

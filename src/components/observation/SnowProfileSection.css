@@ -1,0 +1,454 @@
+.snow-profile-section {
+  margin-bottom: 20px;
+}
+
+.snow-profile-section .section-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 15px 0;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #eee;
+}
+
+.profile-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 15px;
+}
+
+/* 轴控制 */
+.axis-controls {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.axis-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.axis-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #666;
+}
+
+.axis-btn {
+  padding: 4px 10px;
+  border: 1px solid #ddd;
+  background: #fff;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.axis-btn:hover {
+  border-color: var(--accent);
+}
+
+.axis-btn.active {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+/* 图表容器 */
+.chart-container {
+  margin-bottom: 15px;
+}
+
+/* 温度刻度 */
+.temp-scale {
+  margin-bottom: 10px;
+}
+
+.temp-label {
+  font-size: 10px;
+  color: #888;
+  margin-bottom: 4px;
+}
+
+.temp-ticks {
+  position: relative;
+  height: 20px;
+  border-bottom: 1px solid #ddd;
+  margin-left: 40px;
+  margin-right: 40px;
+}
+
+.temp-tick {
+  position: absolute;
+  font-size: 11px;
+  font-weight: 500;
+  color: #555;
+  white-space: nowrap;
+}
+
+/* 主图表区 */
+.chart-main {
+  display: flex;
+  position: relative;
+}
+
+/* 深度刻度 */
+.depth-scale {
+  width: 50px;
+  position: relative;
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.depth-scale.left {
+  text-align: right;
+  padding-right: 10px;
+}
+
+.depth-scale.right {
+  text-align: left;
+  padding-left: 10px;
+}
+
+.depth-label {
+  position: absolute;
+  top: -24px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  white-space: nowrap;
+}
+
+.depth-tick {
+  position: absolute;
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.9);
+  padding: 1px 4px;
+  border-radius: 2px;
+}
+
+/* 图表区域 */
+.chart-area {
+  flex: 1;
+  position: relative;
+  background: #fafafa;
+  border: 1px solid #ddd;
+  min-height: 200px;
+  overflow: hidden;
+}
+
+/* 网格线 */
+.grid-lines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.grid-line {
+  position: absolute;
+  background: #e5e5e5;
+}
+
+.grid-line.horizontal {
+  left: 0;
+  right: 0;
+  height: 1px;
+}
+
+.grid-line.vertical {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+
+/* 图层 SVG */
+.layer-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* 温度曲线 SVG */
+.temp-curve-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* 温度点标签 */
+.temp-point-label {
+  position: absolute;
+  font-size: 9px;
+  color: #666;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+/* 层标签 */
+.layer-label {
+  position: absolute;
+  font-size: 10px;
+  color: #333;
+  font-weight: 500;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* 测试标记 */
+.test-marker {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  pointer-events: none;
+}
+
+.test-marker-line {
+  width: 100%;
+  height: 2px;
+  background: #dc3545;
+}
+
+.test-marker-label {
+  position: absolute;
+  top: -8px;
+  font-size: 9px;
+  color: #dc3545;
+  font-weight: 600;
+  white-space: nowrap;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 1px 4px;
+  border-radius: 2px;
+}
+
+/* 拖动手柄 */
+.layer-handle {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid;
+  cursor: ew-resize;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+}
+
+.layer-handle:hover {
+  transform: translate(-50%, -50%) scale(1.2);
+}
+
+/* 硬度刻度 */
+.hardness-scale {
+  position: relative;
+  height: 30px;
+  margin-left: 40px;
+  margin-right: 40px;
+  border-top: 1px solid #ddd;
+}
+
+.hardness-tick {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 500;
+  color: #555;
+  padding-top: 4px;
+}
+
+.hardness-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-bottom: 2px;
+  border: 1px solid #ccc;
+}
+
+/* 图例 */
+.chart-legend {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  font-size: 10px;
+  color: #888;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
+}
+
+/* 数据表格 */
+.layer-table-wrapper {
+  overflow-x: auto;
+  margin-top: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.layer-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.layer-table th {
+  background: #f8f9fa;
+  padding: 8px 6px;
+  text-align: left;
+  font-weight: 600;
+  color: #555;
+  border-bottom: 1px solid #ddd;
+  white-space: nowrap;
+}
+
+.layer-table td {
+  padding: 6px;
+  border-bottom: 1px solid #eee;
+}
+
+.layer-table tr:last-child td {
+  border-bottom: none;
+}
+
+.table-input {
+  width: 100%;
+  padding: 4px 6px;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  font-size: 11px;
+}
+
+.table-input.narrow {
+  width: 60px;
+}
+
+.table-input.wide {
+  min-width: 120px;
+}
+
+.table-select {
+  padding: 4px 6px;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  font-size: 11px;
+  min-width: 50px;
+}
+
+.remove-btn {
+  width: 22px;
+  height: 22px;
+  border: none;
+  background: #dc3545;
+  color: white;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.remove-btn:hover {
+  background: #c82333;
+}
+
+.empty-row {
+  text-align: center;
+  color: #999;
+  padding: 20px !important;
+}
+
+/* 表格操作 */
+.table-actions {
+  margin-top: 10px;
+}
+
+.add-layer-btn {
+  width: 100%;
+  padding: 10px;
+  background: #f8f9fa;
+  border: 1px dashed #adb5bd;
+  border-radius: 4px;
+  color: #666;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.add-layer-btn:hover {
+  background: #e9ecef;
+  border-color: #888;
+  color: #333;
+}
+
+/* 温度剖面表格 */
+.temperature-table {
+  margin-top: 20px;
+  border-top: 2px solid #eee;
+  padding-top: 15px;
+}
+
+.temperature-table .table-title {
+  color: #e74c3c;
+}
+
+.temperature-table .layer-table {
+  max-width: 400px;
+}
+
+.temperature-table .table-input {
+  width: 100px;
+}
+
+/* 表格标题扩展 */
+.table-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background: #f8f9fa;
+  font-size: 12px;
+  font-weight: 600;
+  color: #555;
+  border-bottom: 1px solid #ddd;
+}
+
+.depth-info {
+  font-weight: normal;
+  font-size: 11px;
+  color: #888;
+}
+
+.depth-info .remaining {
+  color: #17a2b8;
+}
+
+.depth-info .overflow {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+/* 深度范围列 */
+.depth-range {
+  font-weight: 600;
+  color: var(--primary);
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+/* 厚度列（自动计算） */
+.thickness-cell {
+  font-weight: 500;
+  color: #666;
+  font-size: 11px;
+  text-align: center;
+}

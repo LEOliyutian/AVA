@@ -1,0 +1,70 @@
+.conclusion-section {
+  margin-bottom: 20px;
+}
+
+.conclusion-section .section-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 15px 0;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #eee;
+}
+
+.conclusion-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 15px;
+}
+
+.conclusion-hint {
+  background: #e8f4f8;
+  border-left: 4px solid var(--accent);
+  padding: 12px 15px;
+  margin-bottom: 15px;
+  border-radius: 0 4px 4px 0;
+}
+
+.conclusion-hint p {
+  margin: 0 0 8px 0;
+  font-size: 12px;
+  color: #555;
+  font-weight: 600;
+}
+
+.conclusion-hint ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.conclusion-hint li {
+  font-size: 11px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.conclusion-hint li:last-child {
+  margin-bottom: 0;
+}
+
+.conclusion-card textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 13px;
+  line-height: 1.6;
+  resize: vertical;
+  min-height: 150px;
+  font-family: inherit;
+}
+
+.conclusion-card textarea:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.conclusion-card textarea::placeholder {
+  color: #aaa;
+}
