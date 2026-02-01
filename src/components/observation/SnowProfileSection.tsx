@@ -27,6 +27,7 @@ interface SnowProfileSectionProps {
   onYAxisDirectionChange: (dir: 'up' | 'down') => void;
   testMarkers?: TestMarker[];
   totalSnowDepth?: number | string;  // 总雪深 (cm)
+  previewMode?: boolean;  // 预览/打印模式，隐藏所有交互元素
 }
 
 export function SnowProfileSection({
@@ -40,10 +41,12 @@ export function SnowProfileSection({
   onYAxisDirectionChange,
   testMarkers = [],
   totalSnowDepth = 0,
+  previewMode = false,
 }: SnowProfileSectionProps) {
   const chartAreaRef = useRef<HTMLDivElement>(null);
+  const chartMainRef = useRef<HTMLDivElement>(null);
   const [chartWidthPx, setChartWidthPx] = useState(1);
-  const depthScalePx = 8;
+  const [chartHeightPx, setChartHeightPx] = useState(300);
 
   // 解析总雪深
   const totalHS = useMemo(() => {
@@ -55,23 +58,24 @@ export function SnowProfileSection({
   // 用户输入的是层底部距地表的高度，从雪面往下记录
   // 例如：总雪深150，输入140 → 层范围 140-150（雪面），厚度 10cm
   const layersWithDepth = useMemo(() => {
-    // 按 topDepth 降序排序（从雪面往下）
-    const sortedRows = [...layerRows].sort((a, b) => {
+    // 过滤掉空值，按 topDepth 降序排序（从雪面往下）
+    const validRows = layerRows.filter(r => r.topDepth !== '' && Number.isFinite(Number(r.topDepth)));
+    const sortedRows = [...validRows].sort((a, b) => {
       const aTop = Number(a.topDepth) || 0;
       const bTop = Number(b.topDepth) || 0;
       return bTop - aTop; // 降序，大的在前（靠近雪面）
     });
 
-    // 使用总雪深作为起点，如果没有则用最大的 topDepth
+    // 使用总雪深作为起点
     const maxInput = sortedRows.length > 0 ? Math.max(...sortedRows.map(r => Number(r.topDepth) || 0)) : 0;
-    let previousBottom = totalHS > 0 ? totalHS : maxInput; // 从雪面开始
+    let previousBottom = totalHS > 0 ? totalHS : maxInput;
 
-    return sortedRows.map((row) => {
-      const bottomDepth = Number(row.topDepth) || 0; // 用户输入的是层底部高度
-      const startDepth = bottomDepth;      // 层底（较小值）
-      const endDepth = previousBottom;     // 层顶（较大值，靠近雪面）
+    const result = sortedRows.map((row) => {
+      const bottomDepth = Number(row.topDepth) || 0;
+      const startDepth = bottomDepth;
+      const endDepth = previousBottom;
       const thickness = Math.max(0, endDepth - startDepth);
-      previousBottom = bottomDepth; // 下一层的顶部 = 这一层的底部
+      previousBottom = bottomDepth;
       return {
         ...row,
         startDepth,
@@ -79,6 +83,9 @@ export function SnowProfileSection({
         thickness,
       };
     });
+
+    // 过滤掉厚度为0的层（如输入150时总雪深也是150）
+    return result.filter(r => r.thickness > 0);
   }, [layerRows, totalHS]);
 
   // 计算最低层底和剩余深度（到地表还有多少）
@@ -104,6 +111,7 @@ export function SnowProfileSection({
       const entry = entries[0];
       if (entry) {
         setChartWidthPx(entry.contentRect.width);
+        setChartHeightPx(entry.contentRect.height);
       }
     });
 
@@ -122,7 +130,6 @@ export function SnowProfileSection({
   }, [layersWithDepth, totalHS]);
 
   const maxDepthValue = useMemo(() => Math.max(0, ...depthTicks), [depthTicks]);
-  const chartHeightPx = useMemo(() => Math.max(44, maxDepthValue * depthScalePx), [maxDepthValue]);
 
   // 深度百分比计算
   // yAxisDirection === 'down' 表示从高到低（雪面在上，地表在下）
@@ -166,18 +173,35 @@ export function SnowProfileSection({
     });
   }, [resolveAxisPosition]);
 
-  // 温度相关
-  const temperatureTicks = [-0, -5, -10, -15, -20, -25];
+  // 温度相关 - 动态计算温度范围
+  const { minTemp, maxTemp, temperatureTicks } = useMemo(() => {
+    // 获取所有温度点中的最低温度
+    const temps = temperaturePoints
+      .map((pt) => Number(pt.temperature))
+      .filter((t) => Number.isFinite(t));
+
+    const dataMinTemp = temps.length > 0 ? Math.min(...temps) : -25;
+    // 向下取整到5的倍数，确保有足够空间
+    const minT = Math.min(-25, Math.floor(dataMinTemp / 5) * 5 - 5);
+    const maxT = 0;
+
+    // 生成刻度，每5度一个
+    const ticks: number[] = [];
+    for (let t = maxT; t >= minT; t -= 5) {
+      ticks.push(t);
+    }
+
+    return { minTemp: minT, maxTemp: maxT, temperatureTicks: ticks };
+  }, [temperaturePoints]);
+
   const temperatureTickPosition = useCallback(
     (tick: number) => {
-      const minTemp = -25;
-      const maxTemp = 0;
       const range = maxTemp - minTemp || 1;
       const normalized = ((tick - minTemp) / range) * 100;
       const clamped = Math.max(0, Math.min(100, normalized));
       return xAxisSide === 'right' ? clamped : 100 - clamped;
     },
-    [xAxisSide]
+    [xAxisSide, minTemp, maxTemp]
   );
 
   // 图层计算
@@ -259,8 +283,6 @@ export function SnowProfileSection({
   const temperaturePolyline = useMemo(() => {
     if (temperaturePoints.length === 0) return '';
 
-    const minTemp = -25;
-    const maxTemp = 0;
     const range = maxTemp - minTemp || 1;
 
     // 按高度排序（从低到高）
@@ -283,27 +305,23 @@ export function SnowProfileSection({
         return `${x},${y}`;
       })
       .join(' ');
-  }, [temperaturePoints, xAxisSide, resolveDepthPercent]);
+  }, [temperaturePoints, xAxisSide, resolveDepthPercent, minTemp, maxTemp]);
 
   // 温度点（用于显示标签）
-  // 温度深度是从雪面往下的深度
+  // 温度深度是距地表的高度（和雪层一样）
   const temperatureMarkers = useMemo(() => {
-    const minTemp = -25;
-    const maxTemp = 0;
     const range = maxTemp - minTemp || 1;
 
     return temperaturePoints
       .map((pt) => {
-        const depthFromSurface = Number(pt.depth); // 从雪面往下的深度
+        const height = Number(pt.depth); // 距地表的高度
         const temp = Number(pt.temperature);
-        if (!Number.isFinite(depthFromSurface) || !Number.isFinite(temp)) return null;
+        if (!Number.isFinite(height) || !Number.isFinite(temp)) return null;
 
         const normalized = ((temp - minTemp) / range) * 100;
         const clamped = Math.max(0, Math.min(100, normalized));
         const x = xAxisSide === 'right' ? clamped : 100 - clamped;
-        // 转换：从雪面往下的深度 → 距地表高度
-        const heightFromGround = totalHS - depthFromSurface;
-        const y = resolveDepthPercent(Math.max(0, heightFromGround));
+        const y = resolveDepthPercent(height);
 
         return {
           id: pt.id,
@@ -313,7 +331,7 @@ export function SnowProfileSection({
         };
       })
       .filter((pt): pt is NonNullable<typeof pt> => pt !== null);
-  }, [temperaturePoints, xAxisSide, resolveDepthPercent, totalHS]);
+  }, [temperaturePoints, xAxisSide, resolveDepthPercent, minTemp, maxTemp]);
 
   // 测试标记
   const resolvedTestMarkers = useMemo(() => {
@@ -476,10 +494,28 @@ export function SnowProfileSection({
     [layerRows, onLayerRowsChange]
   );
 
-  // 带深度信息的层列表（按输入顺序，从雪面往下）
+  // 带深度信息的层列表（用于表格编辑，保留所有行）
   const sortedLayerRows = useMemo(() => {
-    return layersWithDepth;
-  }, [layersWithDepth]);
+    // 创建一个 id -> 计算结果的映射
+    const depthMap = new Map(layersWithDepth.map(r => [r.id, r]));
+
+    // 对所有行排序，并附加计算的深度信息
+    return [...layerRows]
+      .sort((a, b) => {
+        const aTop = Number(a.topDepth) || 0;
+        const bTop = Number(b.topDepth) || 0;
+        return bTop - aTop;
+      })
+      .map(row => {
+        const calculated = depthMap.get(row.id);
+        return {
+          ...row,
+          startDepth: calculated?.startDepth,
+          endDepth: calculated?.endDepth,
+          thickness: calculated?.thickness,
+        };
+      });
+  }, [layerRows, layersWithDepth]);
 
   // 排序后的温度点（按高度，从大到小，雪面在上地表在下）
   const sortedTempPoints = useMemo(() => {
@@ -538,6 +574,201 @@ export function SnowProfileSection({
     [temperaturePoints, onTemperaturePointsChange]
   );
 
+  // 预览模式渲染
+  if (previewMode) {
+    return (
+      <div className="snow-profile-section preview-mode">
+        <div className="preview-layout">
+          {/* 左侧：图表 */}
+          <div className="preview-chart-area">
+            {/* 温度刻度 */}
+            <div className="temp-scale">
+              <div className="temp-ticks">
+                {temperatureTicks.map((tick, index) => (
+                  <span
+                    key={tick}
+                    className="temp-tick"
+                    style={{
+                      left: `${temperatureTickPosition(tick)}%`,
+                      transform:
+                        index === 0
+                          ? 'translateX(0)'
+                          : index === temperatureTicks.length - 1
+                            ? 'translateX(-100%)'
+                            : 'translateX(-50%)',
+                    }}
+                  >
+                    {tick}°
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* 主图表 */}
+            <div className="chart-main" ref={chartMainRef}>
+              {/* 左侧深度刻度 */}
+              <div className="depth-scale left">
+                <span className="depth-label">cm</span>
+                {depthTicks.map((tick) => (
+                  <span
+                    key={tick}
+                    className="depth-tick"
+                    style={{ top: `${resolveDepthPercent(tick)}%` }}
+                  >
+                    {tick}
+                  </span>
+                ))}
+              </div>
+
+              {/* 图表区域 */}
+              <div ref={chartAreaRef} className="chart-area">
+                {/* 网格线 */}
+                <div className="grid-lines">
+                  {depthTicks.map((tick) => (
+                    <div
+                      key={`h-${tick}`}
+                      className="grid-line horizontal"
+                      style={{ top: `${resolveDepthPercent(tick)}%` }}
+                    />
+                  ))}
+                  {hardnessScale.map((item) => (
+                    <div
+                      key={`v-${item.key}`}
+                      className="grid-line vertical"
+                      style={{ left: `${item.position}%` }}
+                    />
+                  ))}
+                </div>
+
+                {/* 层 SVG */}
+                <svg
+                  className="layer-svg"
+                  viewBox={`0 0 ${chartWidthPx} ${chartHeightPx}`}
+                  preserveAspectRatio="none"
+                >
+                  {layerPolygons.map((layer) => (
+                    <polygon
+                      key={layer.id}
+                      points={layer.points}
+                      fill={layer.color}
+                      stroke={layer.borderColor}
+                      strokeWidth={1}
+                      vectorEffect="non-scaling-stroke"
+                    />
+                  ))}
+                </svg>
+
+                {/* 温度曲线 */}
+                <svg className="temp-curve-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+                  <polyline
+                    points={temperaturePolyline}
+                    fill="none"
+                    stroke="#c0392b"
+                    strokeWidth={2}
+                    vectorEffect="non-scaling-stroke"
+                  />
+                </svg>
+
+                {/* 测试标记 */}
+                {resolvedTestMarkers.map((marker) => (
+                  <div
+                    key={`${marker.depth}-${marker.label}`}
+                    className="test-marker"
+                    style={{ top: `calc(${marker.yPercent}% - 1px)` }}
+                  >
+                    <div className="test-marker-line" />
+                    <span
+                      className="test-marker-label"
+                      style={xAxisSide === 'right' ? { right: 4 } : { left: 4 }}
+                    >
+                      {marker.label}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {/* 右侧深度刻度 */}
+              <div className="depth-scale right">
+                {depthTicks.map((tick) => (
+                  <span
+                    key={tick}
+                    className="depth-tick"
+                    style={{ top: `${resolveDepthPercent(tick)}%` }}
+                  >
+                    {tick}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* 硬度刻度 */}
+            <div className="hardness-scale">
+              {hardnessScale.map((item) => (
+                <span
+                  key={item.key}
+                  className="hardness-tick"
+                  style={{ left: `${item.position}%`, transform: item.transform }}
+                >
+                  {item.label}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* 右侧：数据表 */}
+          <div className="preview-data-area">
+            {/* 雪层数据表 */}
+            <table className="preview-table">
+              <thead>
+                <tr>
+                  <th>深度</th>
+                  <th>厚度</th>
+                  <th>硬度</th>
+                  <th>晶型</th>
+                  <th>粒径</th>
+                  <th>湿度</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sortedLayerRows.map((row) => (
+                  <tr key={row.id}>
+                    <td>{row.startDepth}–{row.endDepth}</td>
+                    <td>{row.thickness}cm</td>
+                    <td>{row.hardness}</td>
+                    <td>{row.type}</td>
+                    <td>{row.grainSize || '-'}</td>
+                    <td>{row.wetness}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {/* 温度数据表 */}
+            {sortedTempPoints.length > 0 && (
+              <table className="preview-table temp-table">
+                <thead>
+                  <tr>
+                    <th>高度</th>
+                    <th>温度</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sortedTempPoints.map((pt) => (
+                    <tr key={pt.id}>
+                      <td>{pt.depth}cm</td>
+                      <td>{pt.temperature}°C</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 编辑模式渲染
   return (
     <div className="snow-profile-section">
       <h3 className="section-title">雪层剖面信息</h3>
@@ -577,372 +808,374 @@ export function SnowProfileSection({
           </div>
         </div>
 
-        {/* 图表区域 */}
-        <div className="chart-container">
-          {/* 温度刻度 */}
-          <div className="temp-scale">
-            <div className="temp-label">温度 (°C)</div>
-            <div className="temp-ticks">
-              {temperatureTicks.map((tick, index) => (
-                <span
-                  key={tick}
-                  className="temp-tick"
-                  style={{
-                    left: `${temperatureTickPosition(tick)}%`,
-                    transform:
-                      index === 0
-                        ? 'translateX(0)'
-                        : index === temperatureTicks.length - 1
-                          ? 'translateX(-100%)'
-                          : 'translateX(-50%)',
-                  }}
-                >
-                  {tick}°C
-                </span>
-              ))}
+        {/* 主布局：左边表格，右边图表 */}
+        <div className="profile-main-layout">
+          {/* 左侧表格区 */}
+          <div className="profile-tables-panel">
+            {/* 雪层数据表格 */}
+            <div className="table-section layers">
+              <div className="layer-table-wrapper in-panel">
+                <div className="table-title">
+                  雪层记录 (输入层底高度)
+                  {totalHS > 0 && (
+                    <span className="depth-info">
+                      总雪深: {totalHS}cm
+                      {remainingDepth > 0 && <span className="remaining"> | 距地表: {remainingDepth}cm</span>}
+                      {isOverflow && <span className="overflow"> | 超出雪面!</span>}
+                    </span>
+                  )}
+                </div>
+                <table className="layer-table">
+                  <thead>
+                    <tr>
+                      <th>高度</th>
+                      <th>范围</th>
+                      <th>厚度</th>
+                      <th>硬度</th>
+                      <th>晶型</th>
+                      <th>粒径</th>
+                      <th>湿度</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sortedLayerRows.map((row) => (
+                      <tr key={row.id}>
+                        <td>
+                          <input
+                            type="number"
+                            value={row.topDepth}
+                            onChange={(e) => updateLayerField(row.id, 'topDepth', e.target.value)}
+                            onKeyDown={handleLayerKeyDown}
+                            className="table-input narrow"
+                            placeholder="cm"
+                            min="0"
+                          />
+                        </td>
+                        <td className="depth-range">
+                          {row.endDepth !== undefined && row.startDepth !== undefined
+                            ? `${row.startDepth}→${row.endDepth}`
+                            : '--'}
+                        </td>
+                        <td className="thickness-cell">
+                          {row.thickness !== undefined && row.thickness > 0 ? `${row.thickness}` : '--'}
+                        </td>
+                        <td>
+                          <select
+                            value={row.hardness}
+                            onChange={(e) => updateLayerField(row.id, 'hardness', e.target.value)}
+                            className="table-select"
+                          >
+                            {HARDNESS_OPTIONS.map((opt) => (
+                              <option key={opt} value={opt}>
+                                {opt}
+                              </option>
+                            ))}
+                          </select>
+                        </td>
+                        <td>
+                          <select
+                            value={row.type}
+                            onChange={(e) => updateLayerField(row.id, 'type', e.target.value)}
+                            className="table-select"
+                          >
+                            {CRYSTAL_TYPE_OPTIONS.map((opt) => (
+                              <option key={opt} value={opt}>
+                                {opt}
+                              </option>
+                            ))}
+                          </select>
+                        </td>
+                        <td>
+                          <input
+                            type="text"
+                            value={row.grainSize}
+                            onChange={(e) => updateLayerField(row.id, 'grainSize', e.target.value)}
+                            className="table-input narrow"
+                            placeholder="mm"
+                          />
+                        </td>
+                        <td>
+                          <select
+                            value={row.wetness}
+                            onChange={(e) => updateLayerField(row.id, 'wetness', e.target.value)}
+                            className="table-select"
+                          >
+                            {WETNESS_OPTIONS.map((opt) => (
+                              <option key={opt} value={opt}>
+                                {opt}
+                              </option>
+                            ))}
+                          </select>
+                        </td>
+                        <td>
+                          <button className="remove-btn" onClick={() => removeLayer(row.id)}>
+                            ×
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                    {sortedLayerRows.length === 0 && (
+                      <tr>
+                        <td colSpan={8} className="empty-row">
+                          暂无数据
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+              <div className="table-actions compact">
+                <button className="add-layer-btn" onClick={addLayer}>
+                  + 新增雪层 (回车)
+                </button>
+              </div>
+            </div>
+
+            {/* 温度剖面记录 */}
+            <div className="table-section temperature">
+              <div className="layer-table-wrapper temperature-table in-panel">
+                <div className="table-title">温度剖面 (高度=距地表)</div>
+                <table className="layer-table">
+                  <thead>
+                    <tr>
+                      <th>高度 (cm)</th>
+                      <th>温度 (°C)</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sortedTempPoints.map((pt) => (
+                      <tr key={pt.id}>
+                        <td>
+                          <input
+                            type="number"
+                            value={pt.depth}
+                            onChange={(e) => updateTempPoint(pt.id, 'depth', e.target.value)}
+                            onKeyDown={handleTempKeyDown}
+                            className="table-input"
+                            placeholder="如: 150"
+                            min="0"
+                          />
+                        </td>
+                        <td>
+                          <input
+                            type="number"
+                            step="0.1"
+                            value={pt.temperature}
+                            onChange={(e) => updateTempPoint(pt.id, 'temperature', e.target.value)}
+                            onKeyDown={handleTempKeyDown}
+                            className="table-input"
+                            placeholder="如: -5"
+                          />
+                        </td>
+                        <td>
+                          <button className="remove-btn" onClick={() => removeTempPoint(pt.id)}>
+                            ×
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                    {sortedTempPoints.length === 0 && (
+                      <tr>
+                        <td colSpan={3} className="empty-row">
+                          暂无温度数据
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+              <div className="table-actions compact">
+                <button className="add-layer-btn" onClick={addTempPoint}>
+                  + 新增温度点 (回车)
+                </button>
+              </div>
             </div>
           </div>
 
-          {/* 主图表 */}
-          <div className="chart-main">
-            {/* 左侧深度刻度 */}
-            <div className="depth-scale left" style={{ height: chartHeightPx }}>
-              <span className="depth-label">深度 (cm)</span>
-              {depthTicks.map((tick) => (
-                <span
-                  key={tick}
-                  className="depth-tick"
-                  style={{ top: `${resolveDepthPercent(tick)}%` }}
-                >
-                  {tick}
-                </span>
-              ))}
-            </div>
+          {/* 右侧图表区 */}
+          <div className="profile-chart-panel">
+            <div className="chart-container">
+              {/* 温度刻度 */}
+              <div className="temp-scale">
+                <div className="temp-label">温度 (°C)</div>
+                <div className="temp-ticks">
+                  {temperatureTicks.map((tick, index) => (
+                    <span
+                      key={tick}
+                      className="temp-tick"
+                      style={{
+                        left: `${temperatureTickPosition(tick)}%`,
+                        transform:
+                          index === 0
+                            ? 'translateX(0)'
+                            : index === temperatureTicks.length - 1
+                              ? 'translateX(-100%)'
+                              : 'translateX(-50%)',
+                      }}
+                    >
+                      {tick}°
+                    </span>
+                  ))}
+                </div>
+              </div>
 
-            {/* 图表区域 */}
-            <div ref={chartAreaRef} className="chart-area" style={{ height: chartHeightPx }}>
-              {/* 网格线 */}
-              <div className="grid-lines">
-                {depthTicks.map((tick) => (
-                  <div
-                    key={`h-${tick}`}
-                    className="grid-line horizontal"
-                    style={{ top: `${resolveDepthPercent(tick)}%` }}
-                  />
-                ))}
+              {/* 主图表 */}
+              <div className="chart-main" ref={chartMainRef}>
+                {/* 左侧深度刻度 */}
+                <div className="depth-scale left">
+                  <span className="depth-label">高度 (cm)</span>
+                  {depthTicks.map((tick) => (
+                    <span
+                      key={tick}
+                      className="depth-tick"
+                      style={{ top: `${resolveDepthPercent(tick)}%` }}
+                    >
+                      {tick}
+                    </span>
+                  ))}
+                </div>
+
+                {/* 图表区域 */}
+                <div ref={chartAreaRef} className="chart-area">
+                  {/* 网格线 */}
+                  <div className="grid-lines">
+                    {depthTicks.map((tick) => (
+                      <div
+                        key={`h-${tick}`}
+                        className="grid-line horizontal"
+                        style={{ top: `${resolveDepthPercent(tick)}%` }}
+                      />
+                    ))}
+                    {hardnessScale.map((item) => (
+                      <div
+                        key={`v-${item.key}`}
+                        className="grid-line vertical"
+                        style={{ left: `${item.position}%` }}
+                      />
+                    ))}
+                  </div>
+
+                  {/* 层 SVG */}
+                  <svg
+                    className="layer-svg"
+                    viewBox={`0 0 ${chartWidthPx} ${chartHeightPx}`}
+                    preserveAspectRatio="none"
+                  >
+                    {layerPolygons.map((layer) => (
+                      <polygon
+                        key={layer.id}
+                        points={layer.points}
+                        fill={layer.color}
+                        stroke={layer.borderColor}
+                        strokeWidth={1}
+                        vectorEffect="non-scaling-stroke"
+                      />
+                    ))}
+                  </svg>
+
+                  {/* 温度曲线 */}
+                  <svg className="temp-curve-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    <polyline
+                      points={temperaturePolyline}
+                      fill="none"
+                      stroke="#e74c3c"
+                      strokeWidth={2}
+                      vectorEffect="non-scaling-stroke"
+                    />
+                  </svg>
+
+                  {/* 温度点标签 */}
+                  {temperatureMarkers.map((point) => (
+                    <span
+                      key={point.id}
+                      className="temp-point-label"
+                      style={{ left: `calc(${point.x}% + 6px)`, top: `${point.y}%` }}
+                    >
+                      {point.label}
+                    </span>
+                  ))}
+
+                  {/* 层标签 */}
+                  {layerLabels.map((label) => (
+                    <span
+                      key={label.id}
+                      className="layer-label"
+                      style={{ left: label.x, top: label.y }}
+                    >
+                      {label.text}
+                    </span>
+                  ))}
+
+                  {/* 测试标记 */}
+                  {resolvedTestMarkers.map((marker) => (
+                    <div
+                      key={`${marker.depth}-${marker.label}`}
+                      className="test-marker"
+                      style={{ top: `calc(${marker.yPercent}% - 1px)` }}
+                    >
+                      <div className="test-marker-line" />
+                      <span
+                        className="test-marker-label"
+                        style={xAxisSide === 'right' ? { right: 96 } : { left: 96 }}
+                      >
+                        {marker.label}
+                      </span>
+                    </div>
+                  ))}
+
+                  {/* 拖动手柄 */}
+                  {layerHandles.map((handle) => (
+                    <button
+                      key={handle.key}
+                      className="layer-handle"
+                      style={{
+                        left: handle.x,
+                        top: handle.y,
+                        backgroundColor: handle.fill,
+                        borderColor: handle.stroke,
+                      }}
+                      onPointerDown={(e) => handleLayerHandleDown(handle.layerId, handle.edge, e)}
+                    />
+                  ))}
+                </div>
+
+                {/* 右侧深度刻度 */}
+                <div className="depth-scale right">
+                  {depthTicks.map((tick) => (
+                    <span
+                      key={tick}
+                      className="depth-tick"
+                      style={{ top: `${resolveDepthPercent(tick)}%` }}
+                    >
+                      {tick}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* 硬度刻度 */}
+              <div className="hardness-scale">
                 {hardnessScale.map((item) => (
-                  <div
-                    key={`v-${item.key}`}
-                    className="grid-line vertical"
-                    style={{ left: `${item.position}%` }}
-                  />
+                  <span
+                    key={item.key}
+                    className="hardness-tick"
+                    style={{ left: `${item.position}%`, transform: item.transform }}
+                  >
+                    <span className="hardness-dot" style={{ backgroundColor: item.color }} />
+                    {item.label}
+                  </span>
                 ))}
               </div>
 
-              {/* 层 SVG */}
-              <svg
-                className="layer-svg"
-                viewBox={`0 0 ${chartWidthPx} ${chartHeightPx}`}
-                preserveAspectRatio="none"
-              >
-                {layerPolygons.map((layer) => (
-                  <polygon
-                    key={layer.id}
-                    points={layer.points}
-                    fill={layer.color}
-                    stroke={layer.borderColor}
-                    strokeWidth={1}
-                    vectorEffect="non-scaling-stroke"
-                  />
-                ))}
-              </svg>
-
-              {/* 温度曲线 */}
-              <svg className="temp-curve-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
-                <polyline
-                  points={temperaturePolyline}
-                  fill="none"
-                  stroke="#888"
-                  strokeWidth={1}
-                  vectorEffect="non-scaling-stroke"
-                />
-              </svg>
-
-              {/* 温度点标签 */}
-              {temperatureMarkers.map((point) => (
-                <span
-                  key={point.id}
-                  className="temp-point-label"
-                  style={{ left: `calc(${point.x}% + 6px)`, top: `${point.y}%` }}
-                >
-                  {point.label}
-                </span>
-              ))}
-
-              {/* 层标签 */}
-              {layerLabels.map((label) => (
-                <span
-                  key={label.id}
-                  className="layer-label"
-                  style={{ left: label.x, top: label.y }}
-                >
-                  {label.text}
-                </span>
-              ))}
-
-              {/* 测试标记 */}
-              {resolvedTestMarkers.map((marker) => (
-                <div
-                  key={`${marker.depth}-${marker.label}`}
-                  className="test-marker"
-                  style={{ top: `calc(${marker.yPercent}% - 1px)` }}
-                >
-                  <div className="test-marker-line" />
-                  <span
-                    className="test-marker-label"
-                    style={xAxisSide === 'right' ? { right: 96 } : { left: 96 }}
-                  >
-                    {marker.label}
-                  </span>
-                </div>
-              ))}
-
-              {/* 拖动手柄 */}
-              {layerHandles.map((handle) => (
-                <button
-                  key={handle.key}
-                  className="layer-handle"
-                  style={{
-                    left: handle.x,
-                    top: handle.y,
-                    backgroundColor: handle.fill,
-                    borderColor: handle.stroke,
-                  }}
-                  onPointerDown={(e) => handleLayerHandleDown(handle.layerId, handle.edge, e)}
-                />
-              ))}
-            </div>
-
-            {/* 右侧深度刻度 */}
-            <div className="depth-scale right" style={{ height: chartHeightPx }}>
-              {depthTicks.map((tick) => (
-                <span
-                  key={tick}
-                  className="depth-tick"
-                  style={{ top: `${resolveDepthPercent(tick)}%` }}
-                >
-                  {tick}
-                </span>
-              ))}
+              {/* 图例 */}
+              <div className="chart-legend">
+                <span>晶型: PP DF RG FC DH SH MF CR</span>
+                <span>湿度: D M W V S</span>
+              </div>
             </div>
           </div>
-
-          {/* 硬度刻度 */}
-          <div className="hardness-scale">
-            {hardnessScale.map((item) => (
-              <span
-                key={item.key}
-                className="hardness-tick"
-                style={{ left: `${item.position}%`, transform: item.transform }}
-              >
-                <span className="hardness-dot" style={{ backgroundColor: item.color }} />
-                {item.label}
-              </span>
-            ))}
-          </div>
-
-          {/* 图例 */}
-          <div className="chart-legend">
-            <span>晶型: PP DF RG FC DH SH MF CR</span>
-            <span>湿度: D M W V S</span>
-          </div>
-        </div>
-
-        {/* 雪层数据表格 */}
-        <div className="layer-table-wrapper">
-          <div className="table-title">
-            雪层记录 (从雪面往下，输入层底高度)
-            {totalHS > 0 && (
-              <span className="depth-info">
-                总雪深: {totalHS}cm
-                {remainingDepth > 0 && <span className="remaining"> | 距地表: {remainingDepth}cm</span>}
-                {isOverflow && <span className="overflow"> | 超出雪面!</span>}
-              </span>
-            )}
-          </div>
-          <table className="layer-table">
-            <thead>
-              <tr>
-                <th>层底高度 (cm)</th>
-                <th>层范围</th>
-                <th>厚度</th>
-                <th>硬度</th>
-                <th>晶型</th>
-                <th>粒径 (mm)</th>
-                <th>湿度</th>
-                <th>备注</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedLayerRows.map((row) => (
-                <tr key={row.id}>
-                  <td>
-                    <input
-                      type="number"
-                      value={row.topDepth}
-                      onChange={(e) => updateLayerField(row.id, 'topDepth', e.target.value)}
-                      onKeyDown={handleLayerKeyDown}
-                      className="table-input"
-                      placeholder="如: 140"
-                      min="0"
-                    />
-                  </td>
-                  <td className="depth-range">
-                    {row.endDepth !== undefined && row.startDepth !== undefined
-                      ? `${row.startDepth} → ${row.endDepth}`
-                      : '--'}
-                  </td>
-                  <td className="thickness-cell">
-                    {row.thickness !== undefined && row.thickness > 0 ? `${row.thickness}cm` : '--'}
-                  </td>
-                  <td>
-                    <select
-                      value={row.hardness}
-                      onChange={(e) => updateLayerField(row.id, 'hardness', e.target.value)}
-                      className="table-select"
-                    >
-                      {HARDNESS_OPTIONS.map((opt) => (
-                        <option key={opt} value={opt}>
-                          {opt}
-                        </option>
-                      ))}
-                    </select>
-                  </td>
-                  <td>
-                    <select
-                      value={row.type}
-                      onChange={(e) => updateLayerField(row.id, 'type', e.target.value)}
-                      className="table-select"
-                    >
-                      {CRYSTAL_TYPE_OPTIONS.map((opt) => (
-                        <option key={opt} value={opt}>
-                          {opt}
-                        </option>
-                      ))}
-                    </select>
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      value={row.grainSize}
-                      onChange={(e) => updateLayerField(row.id, 'grainSize', e.target.value)}
-                      className="table-input narrow"
-                    />
-                  </td>
-                  <td>
-                    <select
-                      value={row.wetness}
-                      onChange={(e) => updateLayerField(row.id, 'wetness', e.target.value)}
-                      className="table-select"
-                    >
-                      {WETNESS_OPTIONS.map((opt) => (
-                        <option key={opt} value={opt}>
-                          {opt}
-                        </option>
-                      ))}
-                    </select>
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      value={row.notes}
-                      onChange={(e) => updateLayerField(row.id, 'notes', e.target.value)}
-                      className="table-input wide"
-                    />
-                  </td>
-                  <td>
-                    <button className="remove-btn" onClick={() => removeLayer(row.id)}>
-                      ×
-                    </button>
-                  </td>
-                </tr>
-              ))}
-              {sortedLayerRows.length === 0 && (
-                <tr>
-                  <td colSpan={8} className="empty-row">
-                    暂无数据
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="table-actions">
-          <button className="add-layer-btn" onClick={addLayer}>
-            + 新增一层
-          </button>
-        </div>
-
-        {/* 温度剖面记录 */}
-        <div className="layer-table-wrapper temperature-table">
-          <div className="table-title">温度剖面 (从雪面往下，0=雪面)</div>
-          <table className="layer-table">
-            <thead>
-              <tr>
-                <th>深度 (cm)</th>
-                <th>温度 (°C)</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedTempPoints.map((pt) => (
-                <tr key={pt.id}>
-                  <td>
-                    <input
-                      type="number"
-                      value={pt.depth}
-                      onChange={(e) => updateTempPoint(pt.id, 'depth', e.target.value)}
-                      onKeyDown={handleTempKeyDown}
-                      className="table-input"
-                      placeholder="如: 10"
-                      min="0"
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      step="0.1"
-                      value={pt.temperature}
-                      onChange={(e) => updateTempPoint(pt.id, 'temperature', e.target.value)}
-                      onKeyDown={handleTempKeyDown}
-                      className="table-input"
-                      placeholder="如: -5"
-                    />
-                  </td>
-                  <td>
-                    <button className="remove-btn" onClick={() => removeTempPoint(pt.id)}>
-                      ×
-                    </button>
-                  </td>
-                </tr>
-              ))}
-              {sortedTempPoints.length === 0 && (
-                <tr>
-                  <td colSpan={3} className="empty-row">
-                    暂无温度数据
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="table-actions">
-          <button className="add-layer-btn" onClick={addTempPoint}>
-            + 新增温度点
-          </button>
         </div>
       </div>
     </div>

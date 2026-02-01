@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useObservationStore } from '../store';
 import { useToast } from '../hooks';
+import { useTheme } from '../contexts/ThemeContext';
 import { validateObservation } from '../utils/validation';
 import { exportToPng } from '../utils';
 import {
@@ -16,6 +17,7 @@ export function ObservationEditorPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { success, error } = useToast();
+  const { theme, toggleTheme } = useTheme();
 
   const {
     currentId,
@@ -45,6 +47,7 @@ export function ObservationEditorPage() {
   const reportRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   // 加载数据
   useEffect(() => {
@@ -97,7 +100,7 @@ export function ObservationEditorPage() {
 
   // 验证表单并获取错误
   const validationErrors = validateObservation(editor);
-  
+
   // 保存处理
   const handleSave = async () => {
     // 首先验证表单数据
@@ -168,38 +171,58 @@ export function ObservationEditorPage() {
   }
 
   return (
-    <div className="observation-editor-page">
-      {/* 顶部导航栏 */}
-      <div className="editor-header">
-        <div className="header-left">
-          <button className="back-btn" onClick={handleBack}>
-            ← 返回列表
-          </button>
-          <h1>{id ? '编辑观测记录' : '新建观测记录'}</h1>
-          {isDirty && <span className="dirty-indicator">*</span>}
+    <div className={`observation-editor-page ${showPreview ? 'preview-mode' : ''}`}>
+      {/* 浮动工具栏 */}
+      <div className="floating-toolbar">
+        <button className="toolbar-btn back" onClick={handleBack} title="返回列表">
+          ←
+        </button>
+        <div className="toolbar-title">
+          {id ? '编辑' : '新建'}
+          {isDirty && <span className="dirty-dot">●</span>}
         </div>
-        <div className="header-right">
-          {editorError && <span className="error-msg">{editorError}</span>}
-          {validationErrors.length > 0 && (
-            <span className="validation-hint">
-              有 {validationErrors.length} 个必填项未完成
-            </span>
+        <div className="toolbar-actions">
+          <button
+            className="toolbar-btn theme-toggle"
+            onClick={toggleTheme}
+            title={theme === 'dark' ? '切换亮色模式' : '切换深色模式'}
+          >
+            {theme === 'dark' ? '☀' : '☾'}
+          </button>
+          {!showPreview && (
+            <button
+              className={`toolbar-btn toggle-sidebar ${sidebarOpen ? 'active' : ''}`}
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              title={sidebarOpen ? '收起侧栏' : '展开侧栏'}
+            >
+              ☰
+            </button>
           )}
           <button
-            className="preview-btn"
+            className={`toolbar-btn preview ${showPreview ? 'active' : ''}`}
             onClick={() => setShowPreview(!showPreview)}
+            title={showPreview ? '返回编辑' : '预览'}
           >
-            {showPreview ? '返回编辑' : '预览报告'}
+            {showPreview ? '✎' : '⎙'}
           </button>
           {showPreview && (
             <button
-              className="export-btn"
+              className="toolbar-btn export"
               onClick={handleExport}
               disabled={isExporting}
+              title="导出PNG"
             >
-              {isExporting ? '导出中...' : '导出PNG'}
+              ↓
             </button>
           )}
+          <button
+            className="toolbar-btn save"
+            onClick={handleSave}
+            disabled={isSaving || validationErrors.length > 0}
+            title="保存"
+          >
+            {isSaving ? '...' : '✓'}
+          </button>
         </div>
       </div>
 
@@ -208,31 +231,65 @@ export function ObservationEditorPage() {
         /* 预览模式 - 可导出的报告 */
         <div className="preview-container">
           <div className="observation-report" ref={reportRef}>
-            {/* 报告头部 */}
+            {/* 报告头部 - 紧凑专业布局 */}
             <div className="report-header">
-              <div className="report-brand">
-                <h1>吉克普林滑雪场</h1>
-                <h2>雪坑观测记录 Snow Pit Observation</h2>
+              <div className="header-top">
+                <div className="brand-title">
+                  <span className="brand-name">吉克普林滑雪场</span>
+                  <span className="report-type">雪坑观测记录</span>
+                </div>
+                <div className="header-date">
+                  <span className="date-value">{editor.info.date}</span>
+                  <span className="observer-value">{editor.info.observer}</span>
+                </div>
               </div>
-              <div className="report-meta">
-                <div className="meta-row">
-                  <span>观测日期: {editor.info.date}</span>
-                  <span>观测员: {editor.info.observer}</span>
+              <div className="header-info">
+                <div className="info-item">
+                  <span className="info-label">位置</span>
+                  <span className="info-value">{editor.info.locationDescription}</span>
                 </div>
-                <div className="meta-row">
-                  <span>地点: {editor.info.locationDescription}</span>
-                  {editor.info.elevation && <span>海拔: {editor.info.elevation}m</span>}
-                </div>
-                <div className="meta-row">
-                  {editor.info.slopeAspect && <span>坡向: {editor.info.slopeAspect}</span>}
-                  {editor.info.slopeAngle && <span>坡度: {editor.info.slopeAngle}°</span>}
-                  {editor.info.totalSnowDepth && <span>总雪深: {editor.info.totalSnowDepth}cm</span>}
-                </div>
-                <div className="meta-row">
-                  {editor.info.airTemperature && <span>气温: {editor.info.airTemperature}°C</span>}
-                  {editor.info.weather && <span>天气: {editor.info.weather}</span>}
-                  {editor.info.wind && <span>风: {editor.info.wind}</span>}
-                </div>
+                {editor.info.elevation && (
+                  <div className="info-item">
+                    <span className="info-label">海拔</span>
+                    <span className="info-value">{editor.info.elevation}m</span>
+                  </div>
+                )}
+                {editor.info.slopeAspect && (
+                  <div className="info-item">
+                    <span className="info-label">坡向</span>
+                    <span className="info-value">{editor.info.slopeAspect}</span>
+                  </div>
+                )}
+                {editor.info.slopeAngle && (
+                  <div className="info-item">
+                    <span className="info-label">坡度</span>
+                    <span className="info-value">{editor.info.slopeAngle}°</span>
+                  </div>
+                )}
+                {editor.info.totalSnowDepth && (
+                  <div className="info-item highlight">
+                    <span className="info-label">HS</span>
+                    <span className="info-value">{editor.info.totalSnowDepth}cm</span>
+                  </div>
+                )}
+                {editor.info.airTemperature && (
+                  <div className="info-item">
+                    <span className="info-label">气温</span>
+                    <span className="info-value">{editor.info.airTemperature}°C</span>
+                  </div>
+                )}
+                {editor.info.weather && (
+                  <div className="info-item">
+                    <span className="info-label">天气</span>
+                    <span className="info-value">{editor.info.weather}</span>
+                  </div>
+                )}
+                {editor.info.wind && (
+                  <div className="info-item">
+                    <span className="info-label">风</span>
+                    <span className="info-value">{editor.info.wind}</span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -240,79 +297,61 @@ export function ObservationEditorPage() {
             <div className="report-profile">
               <SnowProfileSection
                 layerRows={editor.layerRows}
-                onLayerRowsChange={() => {}}
+                onLayerRowsChange={() => { }}
                 temperaturePoints={editor.temperaturePoints}
                 totalSnowDepth={editor.info.totalSnowDepth}
-                onTemperaturePointsChange={() => {}}
+                onTemperaturePointsChange={() => { }}
                 xAxisSide={editor.diagramXAxisSide}
-                onXAxisSideChange={() => {}}
+                onXAxisSideChange={() => { }}
                 yAxisDirection={editor.diagramYAxisDirection}
-                onYAxisDirectionChange={() => {}}
+                onYAxisDirectionChange={() => { }}
                 testMarkers={testMarkers}
+                previewMode={true}
               />
             </div>
 
-            {/* 稳定性测试摘要 */}
-            {editor.stabilityGroups.length > 0 && (
-              <div className="report-tests">
-                <h3>稳定性测试 Stability Tests</h3>
-                <div className="tests-summary">
-                  {editor.stabilityGroups.map((group, idx) => (
-                    <div key={group.id} className="test-summary-item">
-                      <span className="test-depth">{group.depth}cm</span>
-                      <span className="test-results">
-                        {group.tests.map(formatTestLabel).join(', ')}
-                      </span>
-                      {group.weakLayerType && (
-                        <span className="weak-layer">弱层: {group.weakLayerType} {group.weakLayerGrainSize}mm</span>
-                      )}
-                    </div>
-                  ))}
+            {/* 底部信息区 */}
+            <div className="report-bottom">
+              {/* 稳定性测试摘要 */}
+              {editor.stabilityGroups.length > 0 && (
+                <div className="report-tests">
+                  <div className="section-header">稳定性测试</div>
+                  <div className="tests-grid">
+                    {editor.stabilityGroups.map((group) => (
+                      <div key={group.id} className="test-item">
+                        <span className="test-depth">{group.depth}cm</span>
+                        <span className="test-code">{group.tests.map(formatTestLabel).join(' / ')}</span>
+                        {group.weakLayerType && (
+                          <span className="weak-layer">{group.weakLayerType}</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* 结论 */}
-            {editor.conclusion && (
-              <div className="report-conclusion">
-                <h3>结论 Conclusion</h3>
-                <p>{editor.conclusion}</p>
-              </div>
-            )}
+              {/* 结论 */}
+              {editor.conclusion && (
+                <div className="report-conclusion">
+                  <div className="section-header">观测结论</div>
+                  <p className="conclusion-text">{editor.conclusion}</p>
+                </div>
+              )}
+            </div>
 
             {/* 报告页脚 */}
             <div className="report-footer">
-              <p>本记录仅供专业人员参考。Snow pit observation for professional reference only.</p>
+              <span>Snow Pit Observation</span>
+              <span>·</span>
+              <span>Professional Reference Only</span>
             </div>
           </div>
         </div>
       ) : (
         /* 编辑模式 */
         <div className="editor-content">
-          <div className="editor-sidebar">
-            {/* 基本信息 */}
-            <ObservationInfoSection info={editor.info} onChange={setInfo} />
-
-            {/* 稳定性测试 */}
-            <StabilityTestSection
-              groups={editor.stabilityGroups}
-              onAddGroup={addStabilityGroup}
-              onRemoveGroup={removeStabilityGroup}
-              onUpdateGroup={updateStabilityGroup}
-              onAddTest={addTestToGroup}
-              onRemoveTest={removeTestFromGroup}
-              onUpdateTest={updateTest}
-            />
-
-            {/* 结论 */}
-            <ConclusionSection
-              conclusion={editor.conclusion}
-              onChange={setConclusion}
-            />
-          </div>
-
+          {/* 主区域 - 雪层剖面 */}
           <div className="editor-main">
-            {/* 雪层剖面 */}
             <SnowProfileSection
               layerRows={editor.layerRows}
               onLayerRowsChange={setLayerRows}
@@ -326,27 +365,33 @@ export function ObservationEditorPage() {
               totalSnowDepth={editor.info.totalSnowDepth}
             />
           </div>
+
+          {/* 可收起侧栏 */}
+          <div className={`editor-sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
+            <div className="sidebar-content">
+              {/* 基本信息 */}
+              <ObservationInfoSection info={editor.info} onChange={setInfo} />
+
+              {/* 稳定性测试 */}
+              <StabilityTestSection
+                groups={editor.stabilityGroups}
+                onAddGroup={addStabilityGroup}
+                onRemoveGroup={removeStabilityGroup}
+                onUpdateGroup={updateStabilityGroup}
+                onAddTest={addTestToGroup}
+                onRemoveTest={removeTestFromGroup}
+                onUpdateTest={updateTest}
+              />
+
+              {/* 结论 */}
+              <ConclusionSection
+                conclusion={editor.conclusion}
+                onChange={setConclusion}
+              />
+            </div>
+          </div>
         </div>
       )}
-
-      {/* 底部操作栏 */}
-      <div className="editor-footer">
-        <div className="footer-info">
-          {currentId && <span>记录 ID: {currentId}</span>}
-        </div>
-        <div className="footer-actions">
-          <button className="cancel-btn" onClick={handleBack}>
-            取消
-          </button>
-          <button
-            className="save-btn primary"
-            onClick={handleSave}
-            disabled={isSaving || validationErrors.length > 0}
-          >
-            {isSaving ? '保存中...' : '保存记录'}
-          </button>
-        </div>
-      </div>
     </div>
   );
 }

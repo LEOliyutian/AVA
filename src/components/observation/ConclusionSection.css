@@ -1,47 +1,49 @@
 .conclusion-section {
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 }
 
 .conclusion-section .section-title {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--primary);
-  margin: 0 0 15px 0;
-  padding-bottom: 8px;
-  border-bottom: 2px solid #eee;
+  font-size: 11px;
+  font-weight: 600;
+  color: #818cf8;
+  margin: 0 0 8px 0;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
 }
 
 .conclusion-card {
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: 15px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 8px;
+  padding: 10px;
 }
 
 .conclusion-hint {
-  background: #e8f4f8;
-  border-left: 4px solid var(--accent);
-  padding: 12px 15px;
-  margin-bottom: 15px;
-  border-radius: 0 4px 4px 0;
+  background: rgba(129, 140, 248, 0.08);
+  border-left: 3px solid #818cf8;
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  border-radius: 0 6px 6px 0;
 }
 
 .conclusion-hint p {
-  margin: 0 0 8px 0;
-  font-size: 12px;
-  color: #555;
-  font-weight: 600;
+  margin: 0 0 6px 0;
+  font-size: 11px;
+  color: #e5e7eb;
+  font-weight: 500;
 }
 
 .conclusion-hint ul {
   margin: 0;
-  padding-left: 20px;
+  padding-left: 16px;
 }
 
 .conclusion-hint li {
-  font-size: 11px;
-  color: #666;
-  margin-bottom: 4px;
+  font-size: 10px;
+  color: #9ca3af;
+  margin-bottom: 3px;
 }
 
 .conclusion-hint li:last-child {
@@ -50,21 +52,25 @@
 
 .conclusion-card textarea {
   width: 100%;
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 13px;
-  line-height: 1.6;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.5;
   resize: vertical;
-  min-height: 150px;
+  min-height: 120px;
   font-family: inherit;
+  background: rgba(0, 0, 0, 0.2);
+  color: #f3f4f6;
+  transition: all 0.15s ease;
 }
 
 .conclusion-card textarea:focus {
-  border-color: var(--accent);
+  border-color: rgba(129, 140, 248, 0.4);
   outline: none;
+  background: rgba(0, 0, 0, 0.25);
 }
 
 .conclusion-card textarea::placeholder {
-  color: #aaa;
+  color: #6b7280;
 }

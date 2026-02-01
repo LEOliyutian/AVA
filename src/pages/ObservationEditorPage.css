@@ -1,8 +1,110 @@
+/* CSS Variables & Theme Setup */
+.observation-editor-page {
+  /* Font Sizes - Increased as requested */
+  --font-mini: 11px;
+  /* Was 8px */
+  --font-xs: 12px;
+  /* Was 10px */
+  --font-sm: 13px;
+  /* Was 11px */
+  --font-base: 15px;
+  /* Was 12px/13px */
+  --font-md: 16px;
+  /* Was 14px */
+  --font-lg: 18px;
+  /* Was 16px */
+  --font-xl: 24px;
+  /* Brand title */
+
+  /* Colors - Default (Dark Mode) */
+  --page-bg: #0f1419;
+  --loading-text: #6b7280;
+  --spinner-border: rgba(255, 255, 255, 0.1);
+  --spinner-top: #6366f1;
+
+  /* Toolbar */
+  --toolbar-bg: rgba(17, 24, 39, 0.85);
+  --toolbar-border: rgba(255, 255, 255, 0.06);
+  --toolbar-shadow: rgba(0, 0, 0, 0.4);
+  --btn-text: #9ca3af;
+  --btn-hover-bg: rgba(255, 255, 255, 0.08);
+  --btn-hover-text: #f3f4f6;
+  --btn-active-bg: rgba(99, 102, 241, 0.15);
+  --btn-active-text: #818cf8;
+
+  /* Main Content */
+  --main-bg: #1a1f2e;
+
+  /* Sidebar */
+  --sidebar-bg: #111827;
+  --sidebar-border: rgba(255, 255, 255, 0.04);
+  --sidebar-text: #e5e7eb;
+  --scrollbar-thumb: rgba(255, 255, 255, 0.1);
+  --scrollbar-thumb-hover: rgba(255, 255, 255, 0.15);
+
+  /* Validation */
+  --error-text: #f87171;
+  --val-error-bg: rgba(239, 68, 68, 0.15);
+  --val-error-border: rgba(239, 68, 68, 0.2);
+  --val-error-text: #fca5a5;
+
+  /* Report Preview */
+  --preview-bg: #1a1f2e;
+  --report-paper-bg: #ffffff;
+  /* Always white for paper look in preview */
+  --report-shadow: rgba(0, 0, 0, 0.4);
+  --report-text: #334155;
+  --report-title: #1e293b;
+  --report-label: #94a3b8;
+  --report-border: #e2e8f0;
+  --report-header-border: #1e293b;
+  --report-highlight-bg: #eff6ff;
+  --report-highlight-text: #3b82f6;
+  --test-item-bg: #f8fafc;
+  --test-code-bg: #f1f5f9;
+
+  /* Dirty Dot */
+  --dirty-dot: #f87171;
+}
+
+/* Light Theme Overrides */
+[data-theme="light"] .observation-editor-page {
+  --page-bg: #f3f4f6;
+  --loading-text: #4b5563;
+  --spinner-border: rgba(0, 0, 0, 0.1);
+
+  /* Toolbar - Lighter/Glassy */
+  --toolbar-bg: rgba(255, 255, 255, 0.85);
+  --toolbar-border: rgba(0, 0, 0, 0.06);
+  --toolbar-shadow: rgba(0, 0, 0, 0.1);
+  --btn-text: #6b7280;
+  --btn-hover-bg: rgba(0, 0, 0, 0.05);
+  --btn-hover-text: #111827;
+  --btn-active-bg: rgba(99, 102, 241, 0.1);
+
+  /* Main Content */
+  --main-bg: #ffffff;
+
+  /* Sidebar */
+  --sidebar-bg: #f9fafb;
+  /* Slightly off-white */
+  --sidebar-border: #e5e7eb;
+  --sidebar-text: #1f2937;
+  --scrollbar-thumb: rgba(0, 0, 0, 0.1);
+  --scrollbar-thumb-hover: rgba(0, 0, 0, 0.2);
+
+  /* Preview Background (surrounding the paper) */
+  --preview-bg: #e5e7eb;
+}
+
+
 .observation-editor-page {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  background: var(--bg-gray);
+  height: 100vh;
+  background: var(--page-bg);
+  overflow: hidden;
+  transition: background-color 0.3s ease;
 }
 
 .observation-editor-page .loading-state {
@@ -11,238 +113,222 @@
   align-items: center;
   justify-content: center;
   flex: 1;
-  padding: 60px;
+  padding: 48px;
 }
 
 .observation-editor-page .loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid #eee;
-  border-top-color: var(--accent);
+  width: 32px;
+  height: 32px;
+  border: 2px solid var(--spinner-border);
+  border-top-color: var(--spinner-top);
   border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  animation: spin 0.7s linear infinite;
 }
 
 .observation-editor-page .loading-state p {
-  margin-top: 15px;
-  color: #666;
+  margin-top: 12px;
+  color: var(--loading-text);
+  font-size: var(--font-sm);
 }
 
-/* 顶部导航栏 */
-.editor-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 25px;
-  background: white;
-  border-bottom: 1px solid #ddd;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.header-left {
+/* ========== 浮动工具栏 ========== */
+.floating-toolbar {
+  position: fixed;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   align-items: center;
-  gap: 15px;
-}
-
-.back-btn {
-  padding: 8px 15px;
-  background: #f8f9fa;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  color: #555;
-  font-size: 13px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.back-btn:hover {
-  background: #e9ecef;
-  border-color: #ccc;
-}
-
-.header-left h1 {
-  margin: 0;
-  font-size: 18px;
-  color: var(--primary);
-}
-
-.dirty-indicator {
-  color: #dc3545;
-  font-size: 20px;
-  font-weight: bold;
-}
-
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.error-msg {
-  color: #dc3545;
-  font-size: 12px;
-}
-
-.validation-errors {
-  margin-right: 10px;
-  max-width: 300px;
-}
-
-.validation-error {
-  color: #dc3545;
-  font-size: 12px;
-  line-height: 1.4;
-  background: #f8d7da;
+  gap: 4px;
   padding: 4px 8px;
-  border-radius: 3px;
-  border: 1px solid #f5c6cb;
-  margin-bottom: 4px;
+  background: var(--toolbar-bg);
+  border: 1px solid var(--toolbar-border);
+  border-radius: 10px;
+  backdrop-filter: blur(16px);
+  z-index: 1000;
+  box-shadow: 0 4px 24px var(--toolbar-shadow);
+  transition: all 0.3s ease;
 }
 
-.validation-error.more {
-  font-style: italic;
-  color: #6c757d;
-}
-
-.validation-hint {
-  font-size: 12px;
-  color: #856404;
-  background: #fff3cd;
-  padding: 4px 10px;
-  border-radius: 3px;
-  border: 1px solid #ffc107;
-}
-
-.preview-btn {
-  padding: 8px 16px;
-  background: #6c757d;
-  color: white;
+.toolbar-btn {
+  width: 36px;
+  /* Slightly larger for touch targets */
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: none;
-  border-radius: 4px;
-  font-size: 13px;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--btn-text);
+  font-size: 16px;
+  /* Increased icon size */
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.15s ease;
 }
 
-.preview-btn:hover {
-  background: #5a6268;
+.toolbar-btn:hover {
+  background: var(--btn-hover-bg);
+  color: var(--btn-hover-text);
 }
 
-.export-btn {
-  padding: 8px 16px;
-  background: #28a745;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 13px;
-  cursor: pointer;
-  transition: background 0.2s;
+.toolbar-btn.active {
+  background: var(--btn-active-bg);
+  color: var(--btn-active-text);
 }
 
-.export-btn:hover:not(:disabled) {
-  background: #218838;
+.toolbar-btn.back {
+  font-size: 15px;
 }
 
-.export-btn:disabled {
-  opacity: 0.6;
+.toolbar-btn.save {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #fff;
+}
+
+.toolbar-btn.save:hover:not(:disabled) {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+}
+
+.toolbar-btn.save:disabled {
+  opacity: 0.3;
   cursor: not-allowed;
 }
 
-.save-btn {
-  padding: 8px 20px;
-  background: var(--accent);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
+.toolbar-btn.export {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: #fff;
 }
 
-.save-btn:hover:not(:disabled) {
-  background: #2980b9;
+.toolbar-btn.export:hover {
+  background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
 }
 
-.save-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.toolbar-title {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 12px;
+  font-size: var(--font-base);
+  color: var(--btn-text);
+  font-weight: 500;
 }
 
-/* 主要内容区 */
+.dirty-dot {
+  color: var(--dirty-dot);
+  font-size: 10px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.toolbar-actions {
+  display: flex;
+  gap: 4px;
+}
+
+/* ========== 主要内容区 ========== */
 .editor-content {
   display: flex;
   flex: 1;
   overflow: hidden;
-}
-
-.editor-sidebar {
-  width: 500px;
-  background: white;
-  border-right: 1px solid #ddd;
-  overflow-y: auto;
-  padding: 20px;
+  padding-top: 56px;
+  /* Increased top padding for larger toolbar */
 }
 
 .editor-main {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  background: var(--main-bg);
+  min-height: 0;
+  overflow: hidden;
+  transition: background-color 0.3s ease;
+}
+
+.editor-main .snow-profile-section {
+  flex: 1;
+  min-height: 0;
+}
+
+/* ========== 可收起侧栏 ========== */
+.editor-sidebar {
+  width: 360px;
+  /* Slightly wider */
+  background: var(--sidebar-bg);
+  border-left: 1px solid var(--sidebar-border);
+  overflow: hidden;
+  transition: width 0.2s ease, opacity 0.2s ease, background-color 0.3s ease;
+}
+
+.editor-sidebar.closed {
+  width: 0;
+  opacity: 0;
+}
+
+.sidebar-content {
+  width: 360px;
+  height: 100%;
   overflow-y: auto;
-  padding: 20px;
-  background: #f5f6f7;
+  padding: 12px;
+  color: var(--sidebar-text);
 }
 
-/* 底部操作栏 */
-.editor-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 25px;
-  background: white;
-  border-top: 1px solid #ddd;
+.sidebar-content::-webkit-scrollbar {
+  width: 6px;
 }
 
-.footer-info {
-  font-size: 12px;
-  color: #888;
+.sidebar-content::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-.footer-actions {
-  display: flex;
-  gap: 10px;
+.sidebar-content::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 3px;
 }
 
-.cancel-btn {
-  padding: 10px 20px;
-  background: #f8f9fa;
-  border: 1px solid #ddd;
+.sidebar-content::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+/* 隐藏旧的元素 */
+.editor-header,
+.editor-footer,
+.header-left,
+.header-right {
+  display: none;
+}
+
+.error-msg {
+  color: var(--error-text);
+  font-size: var(--font-xs);
+}
+
+.validation-errors {
+  margin-right: 8px;
+  max-width: 280px;
+}
+
+.validation-error {
+  color: var(--val-error-text);
+  font-size: var(--font-xs);
+  line-height: 1.4;
+  background: var(--val-error-bg);
+  padding: 4px 8px;
   border-radius: 4px;
-  color: #555;
-  font-size: 13px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.cancel-btn:hover {
-  background: #e9ecef;
-}
-
-.save-btn.primary {
-  padding: 10px 25px;
-  background: var(--accent);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.save-btn.primary:hover:not(:disabled) {
-  background: #2980b9;
+  border: 1px solid var(--val-error-border);
+  margin-bottom: 4px;
 }
 
 /* 预览容器 */
@@ -250,182 +336,230 @@
   flex: 1;
   overflow-y: auto;
   padding: 20px;
-  background: #e9ecef;
+  padding-top: 64px;
+  background: var(--preview-bg);
   display: flex;
   justify-content: center;
+  align-items: flex-start;
+  transition: background-color 0.3s ease;
 }
 
-/* 观测报告样式 */
+/* 观测报告样式 - Keep Paper look */
 .observation-report {
-  background: white;
-  width: 900px;
+  background: var(--report-paper-bg);
+  width: 860px;
   max-width: 100%;
-  padding: 40px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 24px 32px;
+  box-shadow: 0 8px 32px var(--report-shadow);
+  border-radius: 4px;
+  /* Report fonts shouldn't scale too much to keep print layout, but reasonable increase */
 }
 
+/* 报告头部 */
 .report-header {
-  border-bottom: 3px solid var(--primary);
-  padding-bottom: 20px;
-  margin-bottom: 25px;
+  margin-bottom: 16px;
 }
 
-.report-brand {
-  text-align: center;
-  margin-bottom: 20px;
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--report-header-border);
+  margin-bottom: 12px;
 }
 
-.report-brand h1 {
-  margin: 0;
-  font-size: 26px;
-  color: var(--primary);
+.brand-title {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.brand-name {
+  font-size: var(--font-xl);
   font-weight: 700;
+  color: var(--report-title);
+  letter-spacing: 0.5px;
 }
 
-.report-brand h2 {
-  margin: 5px 0 0;
-  font-size: 18px;
-  color: #555;
+.report-type {
+  font-size: var(--font-base);
+  color: var(--report-label);
   font-weight: 500;
 }
 
-.report-meta {
+.header-date {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  font-size: 14px;
-  color: #333;
+  gap: 16px;
+  font-size: var(--font-base);
+  color: var(--report-text);
 }
 
-.report-meta .meta-row {
+.date-value {
+  font-weight: 600;
+}
+
+.observer-value {
+  color: var(--report-label);
+}
+
+.header-info {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 6px 16px;
 }
 
-.report-meta .meta-row span {
-  background: #f8f9fa;
-  padding: 4px 12px;
-  border-radius: 4px;
-  border: 1px solid #e9ecef;
-}
-
-.report-profile {
-  margin-bottom: 30px;
-}
-
-.report-profile .snow-profile-section {
-  background: transparent;
-  padding: 0;
-}
-
-.report-profile .section-title {
-  font-size: 16px;
-  margin-bottom: 15px;
-}
-
-.report-tests {
-  margin-bottom: 25px;
-  padding: 20px;
-  background: #f8f9fa;
-  border-radius: 6px;
-}
-
-.report-tests h3 {
-  margin: 0 0 15px;
-  font-size: 16px;
-  color: var(--primary);
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 10px;
-}
-
-.tests-summary {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.test-summary-item {
+.info-item {
   display: flex;
   align-items: center;
-  gap: 15px;
-  padding: 10px 15px;
-  background: white;
-  border-radius: 4px;
-  border: 1px solid #e9ecef;
+  gap: 4px;
+  font-size: var(--font-xs);
 }
 
-.test-summary-item .test-depth {
+.info-label {
+  color: var(--report-label);
+  font-weight: 500;
+}
+
+.info-value {
+  color: var(--report-text);
   font-weight: 600;
-  color: var(--primary);
-  min-width: 60px;
 }
 
-.test-summary-item .test-results {
-  font-family: monospace;
-  font-size: 14px;
-  background: #e9ecef;
-  padding: 3px 8px;
+.info-item.highlight {
+  background: var(--report-highlight-bg);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.info-item.highlight .info-value {
+  color: var(--report-highlight-text);
+}
+
+/* 雪层剖面区 */
+.report-profile {
+  margin-bottom: 16px;
+}
+
+/* 底部信息区 */
+.report-bottom {
+  display: flex;
+  gap: 16px;
+}
+
+/* 稳定性测试 */
+.report-tests {
+  flex: 1;
+}
+
+.section-header {
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--report-label);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--report-border);
+}
+
+.tests-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.test-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background: var(--test-item-bg);
+  border: 1px solid var(--report-border);
   border-radius: 3px;
+  font-size: var(--font-xs);
 }
 
-.test-summary-item .weak-layer {
-  font-size: 12px;
-  color: #666;
-  margin-left: auto;
+.test-item .test-depth {
+  font-weight: 700;
+  color: var(--report-highlight-text);
 }
 
+.test-item .test-code {
+  font-family: 'SF Mono', 'Monaco', monospace;
+  font-size: var(--font-mini);
+  background: var(--test-code-bg);
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+
+.test-item .weak-layer {
+  color: #dc2626;
+  font-weight: 500;
+}
+
+/* 结论 */
 .report-conclusion {
-  margin-bottom: 25px;
-  padding: 20px;
-  background: #fff3cd;
-  border-radius: 6px;
-  border-left: 4px solid #ffc107;
+  flex: 1;
 }
 
-.report-conclusion h3 {
-  margin: 0 0 10px;
-  font-size: 16px;
-  color: #856404;
-}
-
-.report-conclusion p {
+.conclusion-text {
   margin: 0;
-  color: #333;
+  font-size: var(--font-sm);
   line-height: 1.6;
+  color: var(--report-text);
 }
 
+/* 页脚 */
 .report-footer {
-  text-align: center;
-  padding-top: 20px;
-  border-top: 1px solid #ddd;
-  font-size: 12px;
-  color: #888;
-}
-
-.report-footer p {
-  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--report-border);
+  font-size: var(--font-mini);
+  color: var(--report-label);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 /* 响应式调整 */
 @media (max-width: 1200px) {
   .editor-content {
     flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .editor-main {
+    flex: none;
+    height: auto;
+    min-height: 400px;
+    /* Increased */
+    border-bottom: 1px solid var(--sidebar-border);
+    overflow: visible;
   }
 
   .editor-sidebar {
     width: 100%;
-    border-right: none;
-    border-bottom: 1px solid #ddd;
-    max-height: 50vh;
+    flex: none;
+    border-left: none;
+    overflow: visible;
   }
 
-  .editor-main {
-    min-height: 50vh;
+  .sidebar-content {
+    width: 100%;
   }
 
   .observation-report {
     width: 100%;
     padding: 20px;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
 }

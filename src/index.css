@@ -1,7 +1,4 @@
 :root {
-  --primary: #2c3e50;
-  --accent: #3498db;
-  --bg-gray: #e9ecef;
   --sidebar-w: 520px;
 
   /* 国际通用危险色 */
@@ -12,6 +9,73 @@
   --c-5: #292b2c;
 }
 
+/* 浅色主题（默认） */
+:root,
+[data-theme="light"] {
+  --primary: #2c3e50;
+  --accent: #3498db;
+  --accent-hover: #2980b9;
+  --bg-gray: #f0f2f5;
+  --bg-page: #ffffff;
+  --bg-card: #ffffff;
+  --bg-input: #ffffff;
+  --bg-sidebar: #f8fafc;
+  --bg-toolbar: rgba(255, 255, 255, 0.95);
+  --bg-hover: rgba(0, 0, 0, 0.04);
+  --bg-active: rgba(52, 152, 219, 0.1);
+  --bg-chart: #ffffff;
+  --text-primary: #1a202c;
+  --text-secondary: #4a5568;
+  --text-muted: #718096;
+  --text-inverse: #ffffff;
+  --border-color: #e2e8f0;
+  --border-light: #f1f5f9;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --success: #38a169;
+  --success-bg: #c6f6d5;
+  --warning: #d69e2e;
+  --warning-bg: #faf089;
+  --error: #e53e3e;
+  --error-bg: #fed7d7;
+  --info: #3182ce;
+  --info-bg: #bee3f8;
+}
+
+/* 深色主题 */
+[data-theme="dark"] {
+  --primary: #e2e8f0;
+  --accent: #63b3ed;
+  --accent-hover: #4299e1;
+  --bg-gray: #0d1117;
+  --bg-page: #161b22;
+  --bg-card: #21262d;
+  --bg-input: #0d1117;
+  --bg-sidebar: #161b22;
+  --bg-toolbar: rgba(22, 27, 34, 0.95);
+  --bg-hover: rgba(255, 255, 255, 0.06);
+  --bg-active: rgba(99, 179, 237, 0.15);
+  --bg-chart: #21262d;
+  --text-primary: #e6edf3;
+  --text-secondary: #8b949e;
+  --text-muted: #6e7681;
+  --text-inverse: #0d1117;
+  --border-color: #30363d;
+  --border-light: #21262d;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --success: #3fb950;
+  --success-bg: #238636;
+  --warning: #d29922;
+  --warning-bg: #9e6a03;
+  --error: #f85149;
+  --error-bg: #da3633;
+  --info: #58a6ff;
+  --info-bg: #1f6feb;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -20,8 +84,9 @@ body {
   margin: 0;
   font-family: 'Segoe UI', 'Roboto', 'Microsoft YaHei', sans-serif;
   background: var(--bg-gray);
-  color: #333;
+  color: var(--text-primary);
   min-height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 #root {
@@ -32,12 +97,12 @@ body {
 /* 侧边栏 */
 .sidebar {
   width: var(--sidebar-w);
-  background: white;
-  border-right: 1px solid #ccc;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
   z-index: 10;
-  box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow-sm);
 }
 
 .sidebar-header {
@@ -61,18 +126,19 @@ body {
 
 /* 表单样式 */
 .form-group {
-  background: #fff;
-  border: 1px solid #ddd;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   padding: 15px;
-  border-radius: 6px;
+  border-radius: 8px;
   margin-bottom: 20px;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .form-title {
   font-size: 13px;
   font-weight: 800;
-  color: var(--primary);
-  border-bottom: 2px solid #f2f2f2;
+  color: var(--text-primary);
+  border-bottom: 2px solid var(--border-light);
   padding-bottom: 8px;
   margin-bottom: 12px;
   text-transform: uppercase;
@@ -95,7 +161,7 @@ label {
   display: block;
   font-size: 11px;
   font-weight: 700;
-  color: #666;
+  color: var(--text-muted);
   margin-bottom: 5px;
 }
 
@@ -104,11 +170,13 @@ input,
 textarea {
   width: 100%;
   padding: 8px 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
   font-size: 12px;
   box-sizing: border-box;
-  transition: 0.2s;
+  transition: all 0.2s ease;
+  background: var(--bg-input);
+  color: var(--text-primary);
 }
 
 select:focus,
@@ -116,6 +184,13 @@ input:focus,
 textarea:focus {
   border-color: var(--accent);
   outline: none;
+  box-shadow: 0 0 0 3px var(--bg-active);
+}
+
+select:hover,
+input:hover,
+textarea:hover {
+  border-color: var(--text-muted);
 }
 
 textarea {

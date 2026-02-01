@@ -57,31 +57,10 @@ function App() {
           }
         />
 
-        {/* 雪层观测记录 - 需要登录 */}
-        <Route
-          path="/observations"
-          element={
-            <ProtectedRoute>
-              <ObservationListPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/observations/new"
-          element={
-            <ProtectedRoute requiredRole="forecaster">
-              <ObservationEditorPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/observations/:id"
-          element={
-            <ProtectedRoute>
-              <ObservationEditorPage />
-            </ProtectedRoute>
-          }
-        />
+        {/* 雪层观测记录 - 公开访问 */}
+        <Route path="/observations" element={<ObservationListPage />} />
+        <Route path="/observations/new" element={<ObservationEditorPage />} />
+        <Route path="/observations/:id" element={<ObservationEditorPage />} />
 
         {/* 404 重定向 */}
         <Route path="*" element={<Navigate to="/" replace />} />
