@@ -3,3 +3,5 @@ export { Input } from './Input';
 export { Select } from './Select';
 export { Textarea } from './Textarea';
 export { Toast, ToastContainer } from './Toast';
+export * from './Modal';
+export { ConfirmDialog } from './ConfirmDialog';

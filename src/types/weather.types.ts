@@ -62,6 +62,8 @@ export type PrecipitationType =
 
 // 单个站点的气象观测数据
 export interface StationObservation {
+  id?: number;                // 站点ID（用于编辑）
+  name: string;               // 站点名称/地点描述
   elevation: number;          // 海拔 (m)
   time: string;               // 观测时间 (如 "10:36")
   cloudCover: CloudCover;     // 云量
@@ -75,18 +77,17 @@ export interface StationObservation {
   tempAir: number;            // 空气温度 (°C)
   blowingSnow: string;        // 风吹雪情况 (HIN)
   snowDepth: number;          // 雪深 HS (cm)
-  hst?: number;               // 暴雪总量 (仅低海拔站)
-  h24?: number;               // 24小时新雪 (仅低海拔站)
+  hst?: number;               // 暴雪总量
+  h24?: number;               // 24小时新雪
 }
 
-// 气象观测记录
+// 气象观测记录（支持动态站点列表）
 export interface WeatherObservation {
   date: string;               // 观测日期
   recorder: string;           // 记录员
   tempMin: number;            // 最低气温
   tempMax: number;            // 最高气温
-  upperStation: StationObservation;  // 高海拔站点 (2600m)
-  lowerStation: StationObservation;  // 低海拔站点 (1850m)
+  stations: StationObservation[];  // 动态站点列表
 }
 
 // 天气数据 (用于预报显示)

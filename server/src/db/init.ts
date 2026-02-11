@@ -12,6 +12,7 @@ const DATA_DIR = path.resolve(__dirname, '../../data');
 const DB_PATH = path.resolve(DATA_DIR, 'avalanche.db');
 const SCHEMA_PATH = path.resolve(__dirname, 'schema.sql');
 const OBSERVATIONS_SCHEMA_PATH = path.resolve(__dirname, 'observations-schema.sql');
+const WEATHER_SCHEMA_PATH = path.resolve(__dirname, 'weather-schema.sql');
 
 async function initDatabase() {
   console.log('初始化数据库...');
@@ -36,6 +37,11 @@ async function initDatabase() {
   console.log('执行观测数据库 schema...');
   const observationsSchema = fs.readFileSync(OBSERVATIONS_SCHEMA_PATH, 'utf-8');
   db.exec(observationsSchema);
+
+  // 执行 weather observations schema
+  console.log('执行气象观测数据库 schema...');
+  const weatherSchema = fs.readFileSync(WEATHER_SCHEMA_PATH, 'utf-8');
+  db.exec(weatherSchema);
 
   // 检查是否已有管理员用户
   const existingAdmin = db.prepare('SELECT id FROM users WHERE username = ?').get('admin');

@@ -1,0 +1,98 @@
+/* ========== WeatherInfoSection - Modern Pro Style ========== */
+.weather-info-section {
+  padding: 0;
+}
+
+.weather-info-section .section-title {
+  padding: 12px 16px;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  background: var(--sidebar-bg);
+  border-bottom: 1px solid var(--sidebar-border);
+  border-top: 1px solid var(--sidebar-border);
+  margin: 0;
+  letter-spacing: 0.5px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(12px);
+}
+
+.weather-info-section .section-title:first-child {
+  border-top: none;
+}
+
+.weather-info-section .info-card {
+  background: transparent;
+  border: none;
+  padding: 20px 16px;
+}
+
+.weather-info-section .info-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.weather-info-section .info-row:last-child {
+  margin-bottom: 0;
+}
+
+.weather-info-section .info-field {
+  flex: 1;
+}
+
+.weather-info-section .info-field.wide {
+  flex: 3;
+}
+
+.weather-info-section .info-field label {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  margin-bottom: 6px;
+}
+
+.weather-info-section .info-field .required {
+  color: var(--danger);
+  margin-left: 2px;
+}
+
+/* Input Styling - Clean Standard */
+.weather-info-section .info-field input,
+.weather-info-section .info-field select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--input-fg);
+  font-family: inherit;
+  font-size: 13px;
+  border-radius: var(--radius-sm);
+  height: 34px;
+  transition: all 0.2s ease;
+}
+
+.weather-info-section .info-field input:focus,
+.weather-info-section .info-field select:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: var(--bg-gray);
+  box-shadow: 0 0 0 3px var(--bg-active);
+}
+
+.weather-info-section .info-field input::placeholder {
+  color: var(--input-placeholder);
+}
+
+.weather-info-section .info-field select {
+  cursor: pointer;
+}
+
+.weather-info-section .info-field select option {
+  background: var(--bg-card);
+  color: var(--text-primary);
+}

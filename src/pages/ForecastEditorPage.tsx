@@ -1,8 +1,10 @@
-import { useEffect, useState, useRef } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useEffect, useState, useRef, useCallback } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { forecastApi, type ForecastDetail, type CreateForecastRequest } from '../api';
 import { useForecastStore } from '../store/forecast.store';
 import { useAuthStore, useCanEdit } from '../store/auth.store';
+import { useTheme } from '../contexts/ThemeContext';
+import { ConfirmDialog } from '../components/ui';
 import { Sidebar } from '../components/sidebar';
 import { ReportSheet } from '../components/report';
 import { useDangerLevels } from '../store/selectors';
@@ -17,6 +19,8 @@ export function ForecastEditorPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
   const [saveMessage, setSaveMessage] = useState('');
+  const [showPublishConfirm, setShowPublishConfirm] = useState(false);
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
 
   const reportRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -25,13 +29,18 @@ export function ForecastEditorPage() {
   const canEdit = useCanEdit(forecast?.forecaster_id);
   const store = useForecastStore();
   const dangerLevels = useDangerLevels();
+  const { theme, toggleTheme } = useTheme();
 
   // 加载现有预报（编辑模式）
   useEffect(() => {
-    if (!id) return;
+    if (!id) {
+      store.reset();
+      return;
+    }
 
     const loadForecast = async () => {
       setIsLoading(true);
+      store.reset();
       const result = await forecastApi.getById(parseInt(id, 10));
 
       if (result.success && result.data) {
@@ -50,11 +59,7 @@ export function ForecastEditorPage() {
         if (f.primary_description) store.setPrimaryDescription(f.primary_description);
         if (f.primary_sectors) {
           const sectors = JSON.parse(f.primary_sectors) as string[];
-          sectors.forEach((s) => {
-            if (!store.primaryProblem.sectors.has(s as any)) {
-              store.togglePrimarySector(s as any);
-            }
-          });
+          store.setPrimarySectors(new Set(sectors as any[]));
         }
 
         store.setSecondaryEnabled(f.secondary_enabled);
@@ -64,11 +69,7 @@ export function ForecastEditorPage() {
         if (f.secondary_description) store.setSecondaryDescription(f.secondary_description);
         if (f.secondary_sectors) {
           const sectors = JSON.parse(f.secondary_sectors) as string[];
-          sectors.forEach((s) => {
-            if (!store.secondaryProblem.sectors.has(s as any)) {
-              store.toggleSecondarySector(s as any);
-            }
-          });
+          store.setSecondarySectors(new Set(sectors as any[]));
         }
 
         if (f.snowpack_observation) store.setSnowpack(f.snowpack_observation);
@@ -87,6 +88,8 @@ export function ForecastEditorPage() {
           if (f.weather.hst != null) store.setWeather('hst', f.weather.hst);
           if (f.weather.hs != null) store.setWeather('hs', f.weather.hs);
         }
+
+        store.markClean();
       } else {
         setError(result.error || '加载失败');
       }

@@ -6,7 +6,8 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "db:init": "tsx src/db/init.ts"
+    "db:init": "tsx src/db/init.ts",
+    "db:seed-weather": "tsx src/db/seed-weather.ts"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

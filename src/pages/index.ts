@@ -5,3 +5,8 @@ export { ForecastDetailPage } from './ForecastDetailPage';
 export { ForecastEditorPage } from './ForecastEditorPage';
 export { ObservationListPage } from './ObservationListPage';
 export { ObservationEditorPage } from './ObservationEditorPage';
+export { WeatherListPage } from './WeatherListPage';
+export { WeatherEditorPage } from './WeatherEditorPage';
+export { WeatherDashboardPage } from './WeatherDashboardPage';
+export { ForecastListPage } from './ForecastListPage';
+export { ForecastDashboardPage } from './ForecastDashboardPage';

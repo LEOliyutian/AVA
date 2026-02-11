@@ -265,7 +265,7 @@ export function StabilityTestSection({
   return (
     <div className="stability-test-section">
       <h3 className="section-title">稳定性测试记录</h3>
-      <p className="section-hint">每个隔离柱测试可记录多个深度的反应</p>
+      <p className="section-hint">每个隔离柱记录断裂深度与弱层信息，可添加多个测试反应</p>
 
       {groups.length === 0 ? (
         <div className="empty-state">
@@ -289,10 +289,46 @@ export function StabilityTestSection({
                 </button>
               </div>
 
-              {/* 添加反应记录 */}
+              {/* 隔离柱级别字段：断裂深度 + 弱层信息 */}
+              <div className="group-info">
+                <div className="test-field">
+                  <label>断裂深度 (cm)</label>
+                  <input
+                    type="number"
+                    value={group.depth}
+                    onChange={(e) => onUpdateGroup(group.id, 'depth', e.target.value)}
+                    placeholder="深度"
+                  />
+                </div>
+                <div className="test-field">
+                  <label>弱层晶型</label>
+                  <select
+                    value={group.weakLayerType}
+                    onChange={(e) => onUpdateGroup(group.id, 'weakLayerType', e.target.value)}
+                  >
+                    <option value="">选择</option>
+                    {CRYSTAL_TYPE_OPTIONS.map((opt) => (
+                      <option key={opt} value={opt}>
+                        {opt}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="test-field">
+                  <label>弱层粒径 (mm)</label>
+                  <input
+                    type="text"
+                    value={group.weakLayerGrainSize}
+                    onChange={(e) => onUpdateGroup(group.id, 'weakLayerGrainSize', e.target.value)}
+                    placeholder="粒径"
+                  />
+                </div>
+              </div>
+
+              {/* 测试反应列表 */}
               <div className="tests-container">
                 <div className="tests-header">
-                  <span>反应记录</span>
+                  <span>测试反应</span>
                   <div className="add-test-controls">
                     <select
                       value={group.addType}
@@ -308,16 +344,16 @@ export function StabilityTestSection({
                       ))}
                     </select>
                     <button className="add-test-btn" onClick={() => onAddTest(group.id)}>
-                      + 添加反应
+                      + 添加测试
                     </button>
                   </div>
                 </div>
 
                 {group.tests.length === 0 ? (
-                  <div className="no-tests">选择测试类型后点击添加反应</div>
+                  <div className="no-tests">选择测试类型后点击添加测试</div>
                 ) : (
                   <div className="tests-list">
-                    {group.tests.map((test, testIndex) => (
+                    {group.tests.map((test) => (
                       <div key={test.id} className="test-item">
                         <div className="test-header">
                           <span className="test-type-badge">{test.type}</span>
@@ -325,52 +361,14 @@ export function StabilityTestSection({
                           <button
                             className="remove-test-btn"
                             onClick={() => onRemoveTest(group.id, test.id)}
-                            title="删除此反应"
+                            title="删除此测试"
                           >
                             ×
                           </button>
                         </div>
 
-                        {/* 反应深度 */}
-                        <div className="reaction-depth">
-                          <label>反应深度 (cm)</label>
-                          <input
-                            type="number"
-                            value={group.depth}
-                            onChange={(e) => onUpdateGroup(group.id, 'depth', e.target.value)}
-                            placeholder="深度"
-                          />
-                        </div>
-
                         {/* 测试结果字段 */}
                         <div className="test-fields">{renderTestFields(group, test)}</div>
-
-                        {/* 弱层信息 */}
-                        <div className="weak-layer-info">
-                          <div className="test-field">
-                            <label>弱层晶型</label>
-                            <select
-                              value={group.weakLayerType}
-                              onChange={(e) => onUpdateGroup(group.id, 'weakLayerType', e.target.value)}
-                            >
-                              <option value="">选择</option>
-                              {CRYSTAL_TYPE_OPTIONS.map((opt) => (
-                                <option key={opt} value={opt}>
-                                  {opt}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                          <div className="test-field">
-                            <label>弱层粒径 (mm)</label>
-                            <input
-                              type="text"
-                              value={group.weakLayerGrainSize}
-                              onChange={(e) => onUpdateGroup(group.id, 'weakLayerGrainSize', e.target.value)}
-                              placeholder="粒径"
-                            />
-                          </div>
-                        </div>
 
                         {/* 备注 */}
                         <div className="test-notes">
@@ -381,7 +379,7 @@ export function StabilityTestSection({
                             onChange={(e) =>
                               onUpdateTest(group.id, test.id, 'notes', e.target.value)
                             }
-                            placeholder="反应备注"
+                            placeholder="测试备注"
                           />
                         </div>
                       </div>

@@ -1,0 +1,290 @@
+/* Weather Editor Page - Modern Premium Design */
+.weather-editor-page {
+  /* Editor-specific typography */
+  --font-family-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-xs: 11px;
+  --font-sm: 12px;
+  --font-base: 13px;
+  --font-md: 15px;
+  --font-lg: 17px;
+  --font-xl: 22px;
+  --spacing-unit: 8px;
+
+  /* Editor-specific: toolbar */
+  --toolbar-bg: var(--bg-toolbar);
+  --toolbar-border: var(--sidebar-border);
+  --toolbar-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+
+  /* Editor-specific: panel */
+  --panel-border: var(--sidebar-border);
+
+  /* Editor-specific: input */
+  --input-bg: var(--bg-input);
+  --input-fg: var(--text-primary);
+  --input-placeholder: var(--text-tertiary);
+
+  /* Editor-specific: interaction */
+  --primary-hover: #38bdf8;
+  --primary-glow: rgba(14, 165, 233, 0.3);
+  --secondary: #60a5fa;
+  --hover-bg: rgba(14, 165, 233, 0.08);
+  --active-bg: rgba(14, 165, 233, 0.15);
+  --focus-ring: 0 0 0 3px rgba(14, 165, 233, 0.4);
+
+  /* Editor-specific: scrollbar */
+  --scrollbar-thumb: rgba(156, 163, 175, 0.3);
+  --scrollbar-thumb-hover: rgba(156, 163, 175, 0.5);
+
+  /* Editor-specific: preview & state */
+  --preview-bg: var(--bg-gray);
+  --dirty-dot: #fbbf24;
+}
+
+/* Light Theme - only editor-specific overrides */
+[data-theme="light"] .weather-editor-page {
+  --toolbar-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  --primary-hover: #0369a1;
+  --primary-glow: rgba(2, 132, 199, 0.2);
+  --hover-bg: rgba(0, 0, 0, 0.03);
+  --active-bg: rgba(2, 132, 199, 0.1);
+}
+
+.weather-editor-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--bg-gray);
+  color: var(--text-primary);
+  font-family: var(--font-family-sans);
+  font-size: var(--font-base);
+  overflow: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  letter-spacing: -0.01em;
+}
+
+/* Loading */
+.weather-editor-page .loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+.weather-editor-page .loading-spinner {
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--sidebar-border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s cubic-bezier(0.6, 0.1, 0.4, 0.9) infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Floating Toolbar */
+.weather-editor-page .floating-toolbar {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px;
+  background: var(--toolbar-bg);
+  border: 1px solid var(--toolbar-border);
+  border-radius: 12px;
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  z-index: 1000;
+  box-shadow: var(--toolbar-shadow);
+  transition: all 0.3s ease;
+}
+
+.weather-editor-page .toolbar-title {
+  font-size: var(--font-base);
+  font-weight: 500;
+  color: var(--text-primary);
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.weather-editor-page .dirty-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--dirty-dot);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--dirty-dot);
+}
+
+.weather-editor-page .toolbar-actions {
+  display: flex;
+  gap: 2px;
+}
+
+.weather-editor-page .toolbar-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.weather-editor-page .toolbar-btn:hover {
+  background: var(--hover-bg);
+  color: var(--text-primary);
+}
+
+.weather-editor-page .toolbar-btn:active {
+  transform: scale(0.96);
+}
+
+.weather-editor-page .toolbar-btn.save {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.weather-editor-page .toolbar-btn.save:hover:not(:disabled) {
+  background: var(--active-bg);
+  color: var(--primary-hover);
+}
+
+.weather-editor-page .toolbar-btn.export {
+  color: var(--text-primary);
+}
+
+/* Main Layout */
+.weather-editor-page .editor-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  padding-top: 0;
+}
+
+/* Sidebar */
+.weather-editor-page .editor-sidebar {
+  width: 380px;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--sidebar-border);
+  backdrop-filter: blur(24px) saturate(180%);
+  display: flex;
+  flex-direction: column;
+  transition: width 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  padding-top: 56px;
+  z-index: 10;
+}
+
+.weather-editor-page .editor-sidebar.closed {
+  width: 0;
+  border-right: none;
+  overflow: hidden;
+}
+
+.weather-editor-page .sidebar-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+}
+
+/* Custom Scrollbar */
+.weather-editor-page ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.weather-editor-page ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.weather-editor-page ::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 5px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.weather-editor-page *:hover::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+}
+
+.weather-editor-page ::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-thumb-hover);
+}
+
+/* Main Area */
+.weather-editor-page .editor-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 0;
+  position: relative;
+  padding: 80px 40px 40px;
+  gap: 16px;
+  overflow-y: auto;
+  background: var(--preview-bg);
+}
+
+/* Preview Container */
+.weather-editor-page .preview-container {
+  flex: 1;
+  background: var(--preview-bg);
+  padding: 80px 40px 40px;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* Preview Mode Adjustments */
+.weather-editor-page.preview-mode .preview-container {
+  padding-top: 80px;
+}
+
+/* Add Station Section */
+.add-station-section {
+  padding: 16px;
+  border-top: 1px solid var(--sidebar-border);
+}
+
+.add-station-btn {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.add-station-btn:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+.add-station-btn .add-icon {
+  font-size: 18px;
+  font-weight: 300;
+}

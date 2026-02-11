@@ -4,6 +4,7 @@ import { forecastApi, type ForecastDetail } from '../api';
 import { useAuthStore, useCanEdit, useIsAdmin } from '../store/auth.store';
 import { DANGER_CONFIG, TREND_CONFIG } from '../config';
 import { RoseDiagram } from '../components/shared';
+import { ConfirmDialog } from '../components/ui';
 import { exportToPng, generateFilename } from '../utils';
 import type { DangerLevel, DangerTrend } from '../types';
 import './ForecastDetailPage.css';
@@ -14,6 +15,8 @@ export function ForecastDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [isExporting, setIsExporting] = useState(false);
+  const [showPublishConfirm, setShowPublishConfirm] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const reportRef = useRef<HTMLDivElement>(null);
   const { user } = useAuthStore();
@@ -40,25 +43,27 @@ export function ForecastDetailPage() {
   }, [id]);
 
   const handlePublish = async () => {
-    if (!forecast || !window.confirm('确定要发布此预报吗？')) return;
+    if (!forecast) return;
 
     const result = await forecastApi.publish(forecast.id);
     if (result.success) {
       setForecast({ ...forecast, status: 'published', published_at: new Date().toISOString() });
     } else {
-      alert(result.error || '发布失败');
+      setError(result.error || '发布失败');
     }
+    setShowPublishConfirm(false);
   };
 
   const handleDelete = async () => {
-    if (!forecast || !window.confirm('确定要删除此预报吗？此操作不可恢复。')) return;
+    if (!forecast) return;
 
     const result = await forecastApi.delete(forecast.id);
     if (result.success) {
       navigate('/');
     } else {
-      alert(result.error || '删除失败');
+      setError(result.error || '删除失败');
     }
+    setShowDeleteConfirm(false);
   };
 
   const handleExport = async () => {
@@ -127,21 +132,20 @@ export function ForecastDetailPage() {
   return (
     <div className="detail-page">
       <header className="detail-header">
-        <Link to="/" className="back-link">← 返回列表</Link>
         <div className="header-actions">
           <button
             onClick={handleExport}
             disabled={isExporting}
             className="btn btn-export"
           >
-            {isExporting ? '导出中...' : '📥 导出图片'}
+            {isExporting ? '导出中...' : '导出图片'}
           </button>
           {canEdit && forecast.status === 'draft' && (
             <>
               <Link to={`/editor/${forecast.id}`} className="btn btn-outline">
                 编辑
               </Link>
-              <button onClick={handlePublish} className="btn btn-primary">
+              <button onClick={() => setShowPublishConfirm(true)} className="btn btn-primary">
                 发布
               </button>
             </>
@@ -152,7 +156,7 @@ export function ForecastDetailPage() {
             </Link>
           )}
           {isAdmin && (
-            <button onClick={handleDelete} className="btn btn-danger">
+            <button onClick={() => setShowDeleteConfirm(true)} className="btn btn-danger">
               删除
             </button>
           )}
@@ -390,6 +394,26 @@ export function ForecastDetailPage() {
           </div>
         </div>
       </main>
+
+      <ConfirmDialog
+        open={showPublishConfirm}
+        title="发布预报"
+        message="确定要发布此预报吗？"
+        confirmText="发布"
+        variant="default"
+        onConfirm={handlePublish}
+        onCancel={() => setShowPublishConfirm(false)}
+      />
+
+      <ConfirmDialog
+        open={showDeleteConfirm}
+        title="删除预报"
+        message="确定要删除此预报吗？此操作不可恢复。"
+        confirmText="确认删除"
+        variant="danger"
+        onConfirm={handleDelete}
+        onCancel={() => setShowDeleteConfirm(false)}
+      />
     </div>
   );
 }

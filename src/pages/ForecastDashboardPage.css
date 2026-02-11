@@ -1,0 +1,131 @@
+/* ========== Forecast Dashboard - Danger Trends ========== */
+
+.forecast-dashboard {
+  min-height: 100vh;
+  background: var(--bg-gray);
+  color: var(--text-primary);
+}
+
+/* Header - reuse same classes as WeatherDashboardPage */
+
+/* ===== Content Layout ===== */
+.forecast-dashboard .dash-content {
+  padding: 24px 28px 48px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ===== Forecast-specific card styles ===== */
+.card-body-inner {
+  padding: 16px 18px;
+  flex: 1;
+  min-width: 0;
+}
+
+.card-danger-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.card-trend-icon {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.card-trend-icon.trend-up { color: #ef4444; }
+.card-trend-icon.trend-down { color: #22c55e; }
+.card-trend-icon.trend-flat { color: #94a3b8; }
+
+.card-trend-label {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ===== Full-width chart ===== */
+.dash-chart-full {
+  grid-column: 1 / -1;
+}
+
+/* Grid color for SVG charts */
+.forecast-dashboard {
+  --grid-color: var(--border-light);
+}
+
+/* ===== Table: danger badges ===== */
+.table-danger-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  color: white;
+}
+
+.table-danger-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: white;
+}
+
+.cell-forecaster {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 12px;
+}
+
+.table-view-btn {
+  padding: 4px 12px;
+  background: var(--accent-light-bg);
+  color: var(--accent);
+  border: none;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.table-view-btn:hover {
+  background: var(--accent);
+  color: white;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 1200px) {
+  .forecast-dashboard .dash-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .forecast-dashboard .dash-content {
+    padding: 16px;
+  }
+
+  .forecast-dashboard .dash-cards {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .forecast-dashboard .dash-charts-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .forecast-dashboard .dash-cards {
+    grid-template-columns: 1fr;
+  }
+}

@@ -7,6 +7,7 @@ import authRoutes from './routes/auth.routes.js';
 import forecastRoutes from './routes/forecast.routes.js';
 import userRoutes from './routes/user.routes.js';
 import observationRoutes from './routes/observation.routes.js';
+import weatherRoutes from './routes/weather.routes.js';
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/forecasts', forecastRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/observations', observationRoutes);
+app.use('/api/weather-observations', weatherRoutes);
 
 // 健康检查
 app.get('/api/health', (_req, res) => {

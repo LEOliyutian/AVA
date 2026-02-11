@@ -1,29 +1,39 @@
+/* ========== ObservationInfoSection - Modern Pro Style ========== */
 .observation-info-section {
-  margin-bottom: 12px;
+  padding: 0;
 }
 
 .observation-info-section .section-title {
-  font-size: 11px;
+  padding: 12px 16px;
   font-weight: 600;
-  color: #818cf8;
-  margin: 0 0 8px 0;
-  padding-bottom: 6px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  letter-spacing: 0.3px;
+  font-size: 11px;
   text-transform: uppercase;
+  color: var(--text-secondary);
+  background: var(--sidebar-bg);
+  border-bottom: 1px solid var(--sidebar-border);
+  border-top: 1px solid var(--sidebar-border);
+  margin: 0;
+  letter-spacing: 0.5px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(12px);
+}
+
+.observation-info-section .section-title:first-child {
+  border-top: none;
 }
 
 .info-card {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  border-radius: 8px;
-  padding: 10px;
+  background: transparent;
+  border: none;
+  padding: 20px 16px;
 }
 
 .info-row {
   display: flex;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
 .info-row:last-child {
@@ -40,49 +50,58 @@
 
 .info-field label {
   display: block;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 500;
-  color: #9ca3af;
-  margin-bottom: 3px;
+  color: var(--text-tertiary);
+  margin-bottom: 6px;
 }
 
 .info-field .required {
-  color: #f87171;
+  color: var(--danger);
   margin-left: 2px;
 }
 
+/* Input Styling - Clean Standard */
 .info-field input,
 .info-field select {
   width: 100%;
-  padding: 6px 8px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 6px;
-  font-size: 12px;
-  background: rgba(0, 0, 0, 0.2);
-  color: #f3f4f6;
-  transition: all 0.15s ease;
+  padding: 8px 10px;
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--input-fg);
+  font-family: inherit;
+  font-size: 13px;
+  border-radius: var(--radius-sm);
+  height: 34px;
+  transition: all 0.2s ease;
 }
 
 .info-field input:focus,
 .info-field select:focus {
   outline: none;
-  border-color: rgba(129, 140, 248, 0.4);
-  background: rgba(0, 0, 0, 0.3);
+  border-color: var(--primary);
+  background: var(--bg-gray);
+  box-shadow: 0 0 0 3px var(--bg-active);
 }
 
 .info-field input::placeholder {
-  color: #6b7280;
+  color: var(--input-placeholder);
+}
+
+.info-field select {
+  cursor: pointer;
 }
 
 .info-field select option {
-  background: #1f2937;
-  color: #f3f4f6;
+  background: var(--bg-card);
+  color: var(--text-primary);
 }
 
+/* Dividers */
 .section-divider {
   display: flex;
   align-items: center;
-  margin: 12px 0 10px;
+  margin: 24px 0 16px;
 }
 
 .section-divider::before,
@@ -90,14 +109,14 @@
   content: '';
   flex: 1;
   height: 1px;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--sidebar-border);
 }
 
 .section-divider span {
-  padding: 0 10px;
-  font-size: 9px;
+  padding: 0 12px;
+  font-size: 10px;
   font-weight: 600;
-  color: #6b7280;
+  color: var(--text-tertiary);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
 }

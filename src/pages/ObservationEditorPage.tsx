@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useObservationStore } from '../store';
 import { useToast } from '../hooks';
 import { useTheme } from '../contexts/ThemeContext';
+import { ConfirmDialog } from '../components/ui';
 import { validateObservation } from '../utils/validation';
 import { exportToPng } from '../utils';
 import {
@@ -48,6 +49,7 @@ export function ObservationEditorPage() {
   const [isExporting, setIsExporting] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
 
   // 加载数据
   useEffect(() => {
@@ -136,9 +138,7 @@ export function ObservationEditorPage() {
   // 返回列表
   const handleBack = () => {
     if (isDirty) {
-      if (window.confirm('有未保存的更改，确定要离开吗？')) {
-        navigate('/observations');
-      }
+      setShowLeaveConfirm(true);
     } else {
       navigate('/observations');
     }
@@ -392,6 +392,17 @@ export function ObservationEditorPage() {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        open={showLeaveConfirm}
+        title="未保存的更改"
+        message="有未保存的更改，确定要离开吗？"
+        confirmText="离开"
+        cancelText="继续编辑"
+        variant="warning"
+        onConfirm={() => navigate('/observations')}
+        onCancel={() => setShowLeaveConfirm(false)}
+      />
     </div>
   );
 }

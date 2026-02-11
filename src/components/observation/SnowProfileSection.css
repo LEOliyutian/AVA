@@ -1,325 +1,558 @@
+/* ========== SnowProfileSection - Dashboard Grid ========== */
 .snow-profile-section {
   height: 100%;
   display: flex;
   flex-direction: column;
+  background: var(--panel-bg);
+  border: var(--glass-border);
+  border-radius: var(--radius-lg);
+  overflow: visible;
 }
 
-/* ========== 预览模式样式 ========== */
-.snow-profile-section.preview-mode {
-  height: auto;
-}
-
-.preview-layout {
-  display: flex;
-  gap: 16px;
-}
-
-.preview-chart-area {
-  flex: 1;
-  min-width: 0;
-}
-
-.preview-mode .temp-scale {
-  margin-bottom: 3px;
-}
-
-.preview-mode .temp-ticks {
-  margin-left: 32px;
-  margin-right: 8px;
-  height: 14px;
-}
-
-.preview-mode .temp-tick {
-  font-size: 8px;
-  color: #dc2626;
-}
-
-.preview-mode .chart-main {
-  height: 300px;
-  flex: none;
-}
-
-.preview-mode .depth-scale {
-  width: 32px;
-  height: 100%;
-}
-
-.preview-mode .depth-label {
-  font-size: 8px;
-  top: -12px;
-}
-
-.preview-mode .depth-tick {
-  font-size: 8px;
-  padding: 0 2px;
-}
-
-.preview-mode .chart-area {
-  flex: 1;
-  height: 100%;
-  min-height: 0;
-  border: 1px solid #d1d5db;
-}
-
-.preview-mode .hardness-scale {
-  margin-left: 32px;
-  margin-right: 8px;
-  height: 18px;
-}
-
-.preview-mode .hardness-tick {
-  font-size: 8px;
-}
-
-.preview-mode .hardness-dot {
-  display: none;
-}
-
-.preview-mode .test-marker-label {
-  font-size: 7px;
-  padding: 1px 2px;
-}
-
-/* 预览数据表 */
-.preview-data-area {
-  flex: 0 0 180px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.preview-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 8px;
-}
-
-.preview-table th {
-  background: #f8fafc;
-  padding: 3px 5px;
-  text-align: left;
-  font-weight: 600;
-  color: #64748b;
-  border-bottom: 1px solid #e2e8f0;
-  white-space: nowrap;
-}
-
-.preview-table td {
-  padding: 2px 5px;
-  border-bottom: 1px solid #f1f5f9;
-  color: #334155;
-}
-
-.preview-table tr:last-child td {
-  border-bottom: none;
-}
-
-.preview-table.temp-table th {
-  color: #dc2626;
-}
-
-.preview-table.temp-table td:last-child {
-  color: #dc2626;
-  font-weight: 500;
-}
-
-/* ========== 编辑模式样式 ========== */
-
-.snow-profile-section .section-title {
-  display: none;
-}
-
-.profile-card {
-  background: transparent;
-  border: none;
-  padding: 0;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
-
-/* 主布局：左边表格，右边图表 */
+/* Layout - Split View (Input Left, Chart Right) */
 .profile-main-layout {
-  display: flex;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: 420px 1fr;
   flex: 1;
   min-height: 0;
+  overflow: visible;
 }
 
-/* 左侧表格区 */
+/* ========== Left Panel: Data Grid ========== */
 .profile-tables-panel {
-  flex: 0 0 320px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  min-height: 0;
-  padding: 10px;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.04);
-}
-
-/* 右侧图表区 */
-.profile-chart-panel {
-  flex: 1;
-  min-width: 220px;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
-
-/* 轴控制 */
-.axis-controls {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 8px;
-  padding: 6px 10px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.04);
-}
-
-.axis-group {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.axis-label {
-  font-size: 10px;
-  font-weight: 500;
-  color: #9ca3af;
-}
-
-.axis-btn {
-  padding: 3px 8px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 4px;
-  font-size: 10px;
-  color: #9ca3af;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.axis-btn:hover {
-  border-color: rgba(129, 140, 248, 0.4);
-  background: rgba(129, 140, 248, 0.1);
-  color: #e5e7eb;
-}
-
-.axis-btn.active {
-  background: rgba(129, 140, 248, 0.2);
-  color: #a5b4fc;
-  border-color: rgba(129, 140, 248, 0.3);
-}
-
-/* 图表容器 */
-.chart-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  background: #161b26;
-  border-radius: 8px;
-  padding: 10px;
-}
-
-/* 温度刻度 - 顶部 */
-.temp-scale {
-  margin-bottom: 6px;
-  padding-left: 45px;
-  padding-right: 8px;
-}
-
-.temp-label {
-  font-size: 8px;
-  color: #f87171;
-  margin-bottom: 2px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  padding-left: 3px;
-}
-
-.temp-ticks {
-  position: relative;
-  height: 18px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.temp-tick {
-  position: absolute;
-  font-size: 9px;
-  font-weight: 600;
-  color: #ef4444;
-  white-space: nowrap;
-  top: 0;
-}
-
-/* 主图表区 */
-.chart-main {
-  display: flex;
-  position: relative;
-  flex: 1;
-  min-height: 0;
-  padding-top: 6px;
-}
-
-/* 深度刻度 */
-.depth-scale {
-  width: 45px;
-  position: relative;
-  flex-shrink: 0;
-  z-index: 10;
-  height: 100%;
-}
-
-.depth-scale.left {
-  text-align: right;
-  padding-right: 6px;
-}
-
-.depth-scale.right {
-  text-align: left;
-  padding-left: 6px;
-}
-
-.depth-label {
-  position: absolute;
-  top: -18px;
-  left: 0;
-  right: 0;
-  font-size: 8px;
-  font-weight: 600;
-  color: #6b7280;
-  white-space: nowrap;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  text-align: center;
-}
-
-.depth-tick {
-  position: absolute;
-  font-size: 9px;
-  font-weight: 600;
-  color: #e5e7eb;
-  transform: translateY(-50%);
-}
-
-/* 图表区域 */
-.chart-area {
-  flex: 1;
-  position: relative;
-  background: linear-gradient(180deg, #1e242f 0%, #161b26 100%);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 4px;
+  border-right: 1px solid var(--sidebar-border);
+  background: var(--bg-input);
   min-height: 0;
   overflow: hidden;
 }
 
-/* 网格线 */
+/* ========== Table Tabs ========== */
+.table-tabs {
+  display: flex;
+  background: var(--bg-gray);
+  border-bottom: 1px solid var(--sidebar-border);
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 10px 12px;
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+
+.tab-btn:hover {
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.tab-btn.active {
+  color: var(--primary);
+  background: var(--bg-active);
+  border-bottom-color: var(--primary);
+}
+
+.tab-count {
+  font-size: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+.tab-btn.active .tab-count {
+  background: var(--bg-active);
+  color: var(--primary);
+}
+
+.table-section {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.table-section.active {
+  display: flex;
+}
+
+.table-title {
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid var(--sidebar-border);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.table-hint {
+  font-weight: 400;
+  color: var(--text-tertiary);
+  font-size: 10px;
+  text-transform: none;
+}
+
+.layer-table-wrapper.in-panel {
+  flex: 1;
+  overflow: auto;
+  border: none;
+}
+
+/* Data Grid Table Styling */
+.layer-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-family: var(--font-family-mono);
+  font-size: 12px;
+}
+
+.layer-table th {
+  background: var(--bg-card);
+  color: var(--text-tertiary);
+  font-weight: 600;
+  padding: 6px 4px;
+  text-align: center;
+  border-bottom: 1px solid var(--sidebar-border);
+  border-right: 1px solid var(--sidebar-border);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.layer-table th:last-child {
+  border-right: none;
+}
+
+/* Column Width Controls */
+.layer-table th.col-drag,
+.layer-table td.drag-handle {
+  width: 28px;
+  min-width: 28px;
+  max-width: 28px;
+}
+
+.layer-table th.col-depth {
+  width: 52px;
+  min-width: 52px;
+}
+
+.layer-table th.col-range {
+  width: 70px;
+  min-width: 70px;
+}
+
+.layer-table th.col-select {
+  width: 50px;
+  min-width: 50px;
+}
+
+.layer-table th.col-num {
+  width: 48px;
+  min-width: 48px;
+}
+
+.layer-table th.col-action {
+  width: 32px;
+  min-width: 32px;
+}
+
+/* Compact columns table */
+.layer-table.compact-cols {
+  table-layout: fixed;
+}
+
+.layer-table td {
+  padding: 0;
+  border-bottom: 1px solid var(--sidebar-border);
+  border-right: 1px solid var(--sidebar-border);
+  background: transparent;
+}
+
+.layer-table td:last-child {
+  border-right: none;
+}
+
+/* ========== Drag Handle ========== */
+.drag-handle {
+  width: 28px;
+  min-width: 28px;
+  text-align: center;
+  cursor: grab;
+  user-select: none;
+  background: rgba(255, 255, 255, 0.02);
+  transition: background 0.15s;
+}
+
+.drag-handle:hover {
+  background: var(--bg-active);
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.drag-icon {
+  color: var(--text-tertiary);
+  font-size: 14px;
+  letter-spacing: -2px;
+  opacity: 0.6;
+  transition: opacity 0.15s, color 0.15s;
+}
+
+.drag-handle:hover .drag-icon {
+  opacity: 1;
+  color: var(--primary);
+}
+
+/* Dragging States */
+.layer-table tr.dragging {
+  opacity: 0.5;
+  background: var(--bg-active);
+}
+
+.layer-table tr.drag-over {
+  position: relative;
+}
+
+.layer-table tr.drag-over::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--primary);
+  z-index: 10;
+}
+
+/* In-Cell Input (Excel-like) */
+.table-input {
+  width: 100%;
+  height: 32px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 12px;
+  text-align: center;
+  padding: 0 4px;
+  transition: all 0.1s;
+}
+
+.table-input:hover {
+  background: rgba(255, 255, 255, 0.03);
+  box-shadow: inset 0 0 0 1px var(--input-border);
+}
+
+.table-input:focus {
+  background: var(--bg-gray);
+  box-shadow: inset 0 0 0 2px var(--primary);
+  color: var(--text-primary);
+  z-index: 10;
+  position: relative;
+}
+
+.table-input::placeholder {
+  color: transparent;
+}
+
+.table-input:focus::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* Select as transparent overlay */
+.table-select {
+  width: 100%;
+  height: 32px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  color: var(--text-primary);
+  font-size: 12px;
+  padding: 0 4px;
+}
+
+.table-select:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.table-select:focus {
+  background: var(--bg-gray);
+  box-shadow: inset 0 0 0 2px var(--primary);
+  outline: none;
+}
+
+/* Remove Button */
+.remove-btn {
+  width: 100%;
+  height: 32px;
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary);
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.remove-btn:hover {
+  background: var(--error-bg);
+  color: var(--error);
+}
+
+/* Depth Range Cell */
+.depth-range {
+  color: var(--text-secondary);
+  font-size: 11px;
+  text-align: center;
+  padding: 0 4px;
+}
+
+/* Empty Row */
+.empty-row {
+  text-align: center;
+  color: var(--text-tertiary);
+  padding: 16px !important;
+  font-size: 12px;
+}
+
+/* Actions */
+.table-actions {
+  padding: 8px;
+  border-top: 1px solid var(--sidebar-border);
+  background: var(--bg-input);
+}
+
+.table-actions.compact {
+  padding: 6px 8px;
+}
+
+.add-layer-btn {
+  width: 100%;
+  padding: 6px;
+  background: var(--bg-active);
+  color: var(--primary);
+  border: 1px dashed var(--primary);
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.add-layer-btn:hover {
+  background: var(--primary);
+  color: white;
+  border-style: solid;
+}
+
+/* Depth Info */
+.depth-info {
+  font-weight: 400;
+  color: var(--text-secondary);
+  font-size: 10px;
+  text-transform: none;
+}
+
+.depth-info .remaining {
+  color: var(--text-tertiary);
+}
+
+.depth-info .overflow {
+  color: var(--error);
+  font-weight: 600;
+}
+
+/* ========== Right Panel: Visualization ========== */
+.profile-chart-panel {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-page);
+  padding: 0;
+  min-height: 0;
+  overflow: visible;
+}
+
+/* Chart Toolbar */
+.axis-controls {
+  padding: 8px 16px;
+  background: var(--bg-hover);
+  border-bottom: 1px solid var(--sidebar-border);
+  display: flex;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.axis-group {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+  background: var(--bg-gray);
+  padding: 2px;
+  border-radius: 6px;
+  border: 1px solid var(--sidebar-border);
+}
+
+.axis-label {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  padding: 0 8px;
+}
+
+.axis-btn {
+  padding: 4px 12px;
+  border: none;
+  background: transparent;
+  color: var(--text-tertiary);
+  font-size: 11px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.axis-btn.active {
+  background: var(--sidebar-bg);
+  color: var(--text-primary);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Main Chart Area */
+.chart-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 40px 20px 16px;
+  min-height: 0;
+  background: transparent;
+  overflow: visible;
+}
+
+/* Temperature Scale */
+.temp-scale {
+  position: relative;
+  height: 32px;
+  margin-left: 56px;
+  margin-right: 56px;
+  margin-bottom: 8px;
+  overflow: visible;
+  z-index: 10;
+}
+
+.temp-label {
+  position: absolute;
+  left: -56px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--temp-color);
+  white-space: nowrap;
+  z-index: 10;
+}
+
+.temp-ticks {
+  position: relative;
+  height: 100%;
+  overflow: visible;
+}
+
+.temp-tick {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  color: var(--temp-color);
+  font-weight: 600;
+  z-index: 10;
+}
+
+/* Chart Main Area */
+.chart-main {
+  flex: 1;
+  display: flex;
+  min-height: 200px;
+  margin-top: 8px;
+  overflow: visible;
+  position: relative;
+}
+
+/* Depth Scale */
+.depth-scale {
+  width: 56px;
+  position: relative;
+  flex-shrink: 0;
+  padding-top: 0;
+  overflow: visible;
+  z-index: 5;
+}
+
+.depth-scale.left {
+  text-align: right;
+  padding-right: 10px;
+}
+
+.depth-scale.right {
+  text-align: left;
+  padding-left: 10px;
+}
+
+.depth-label {
+  position: absolute;
+  top: -24px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  z-index: 10;
+}
+
+.depth-scale.left .depth-label {
+  right: 10px;
+}
+
+.depth-scale.right .depth-label {
+  left: 10px;
+}
+
+.depth-tick {
+  position: absolute;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transform: translateY(-50%);
+  z-index: 5;
+}
+
+/* Chart Area */
+.chart-area {
+  flex: 1;
+  background: var(--bg-card);
+  border: 1px solid var(--sidebar-border);
+  border-radius: var(--radius-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Grid Lines */
 .grid-lines {
   position: absolute;
   inset: 0;
@@ -328,23 +561,23 @@
 
 .grid-line {
   position: absolute;
-  background: rgba(255, 255, 255, 0.05);
 }
 
 .grid-line.horizontal {
   left: 0;
   right: 0;
   height: 1px;
+  background: var(--grid-color);
 }
 
 .grid-line.vertical {
   top: 0;
   bottom: 0;
   width: 1px;
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--grid-color);
 }
 
-/* 图层 SVG */
+/* Layer SVG */
 .layer-svg {
   position: absolute;
   inset: 0;
@@ -352,7 +585,7 @@
   height: 100%;
 }
 
-/* 温度曲线 SVG */
+/* Temperature Curve SVG */
 .temp-curve-svg {
   position: absolute;
   inset: 0;
@@ -361,370 +594,229 @@
   pointer-events: none;
 }
 
-/* 温度点标签 */
+/* Temperature Point Label */
 .temp-point-label {
   position: absolute;
-  font-size: 8px;
-  color: #fff;
+  font-size: 11px;
   font-weight: 600;
-  pointer-events: none;
+  color: var(--temp-color);
   transform: translateY(-50%);
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-  padding: 1px 4px;
-  border-radius: 3px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-/* 层标签 */
-.layer-label {
-  position: absolute;
-  font-size: 8px;
-  color: #fff;
-  font-weight: 600;
   pointer-events: none;
   white-space: nowrap;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
-  background: rgba(0, 0, 0, 0.35);
-  padding: 1px 3px;
-  border-radius: 2px;
 }
 
-/* 测试标记 */
+/* Layer Label */
+.layer-label {
+  position: absolute;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-primary);
+  pointer-events: none;
+  text-shadow: var(--chart-label-shadow);
+}
+
+/* Test Marker */
 .test-marker {
   position: absolute;
   left: 0;
   right: 0;
-  height: 2px;
   pointer-events: none;
-  z-index: 5;
 }
 
 .test-marker-line {
-  width: 100%;
+  position: absolute;
+  left: 0;
+  right: 0;
   height: 2px;
-  background: linear-gradient(90deg, #f87171, #fca5a5);
-  box-shadow: 0 0 4px rgba(248, 113, 113, 0.5);
+  background: repeating-linear-gradient(
+    90deg,
+    #f59e0b 0,
+    #f59e0b 4px,
+    transparent 4px,
+    transparent 8px
+  );
 }
 
 .test-marker-label {
   position: absolute;
-  top: -9px;
-  font-size: 8px;
-  color: #fff;
-  font-weight: 600;
+  top: -8px;
+  font-size: 9px;
+  color: var(--warning);
+  background: var(--bg-gray);
+  padding: 1px 4px;
+  border-radius: 2px;
   white-space: nowrap;
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-  padding: 1px 5px;
-  border-radius: 3px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* 拖动手柄 */
+/* Layer Handle */
 .layer-handle {
   position: absolute;
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  border: 2px solid;
+  background: var(--primary);
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   cursor: ew-resize;
+  z-index: 50;
   transform: translate(-50%, -50%);
-  z-index: 10;
-  transition: transform 0.12s, box-shadow 0.12s;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: transform 0.1s, box-shadow 0.1s;
 }
 
 .layer-handle:hover {
-  transform: translate(-50%, -50%) scale(1.25);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+  transform: translate(-50%, -50%) scale(1.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
 }
 
-/* 硬度刻度 - 底部 */
+.layer-handle:active {
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+/* Hardness Scale */
 .hardness-scale {
   position: relative;
-  height: 24px;
-  margin-left: 45px;
-  margin-right: 8px;
-  margin-top: 5px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  height: 32px;
+  margin-left: 56px;
+  margin-right: 56px;
+  margin-top: 8px;
 }
 
 .hardness-tick {
   position: absolute;
+  top: 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
   display: flex;
-  flex-direction: column;
   align-items: center;
-  font-size: 9px;
-  font-weight: 600;
-  color: #9ca3af;
-  padding-top: 5px;
-  letter-spacing: 0.2px;
+  gap: 4px;
 }
 
 .hardness-dot {
-  display: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.hardness-scale::before {
-  content: "硬度";
-  position: absolute;
-  left: -42px;
-  top: 6px;
-  font-size: 8px;
-  font-weight: 600;
-  color: #6b7280;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-/* 图例 */
+/* Chart Legend */
 .chart-legend {
   display: flex;
   justify-content: center;
-  gap: 20px;
-  font-size: 8px;
-  color: #6b7280;
-  margin-top: 8px;
-  padding-top: 6px;
-  border-top: 1px solid rgba(255, 255, 255, 0.04);
-  letter-spacing: 0.3px;
+  gap: 24px;
+  padding-top: 12px;
+  font-size: 11px;
+  color: var(--text-tertiary);
 }
 
-/* 数据表格 */
-.layer-table-wrapper {
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 6px;
-  background: rgba(0, 0, 0, 0.15);
-  overflow: hidden;
-}
-
-.layer-table-wrapper.in-panel {
-  margin-top: 0;
-  flex: 1 1 0;
-  min-height: 50px;
-  overflow-y: auto;
-}
-
-.layer-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 9px;
-}
-
-.layer-table th {
-  background: rgba(255, 255, 255, 0.03);
-  padding: 5px 3px;
-  text-align: left;
-  font-weight: 600;
-  color: #9ca3af;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  white-space: nowrap;
-  position: sticky;
-  top: 0;
-}
-
-.layer-table td {
-  padding: 3px 2px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-  color: #e5e7eb;
-}
-
-.layer-table tr:last-child td {
-  border-bottom: none;
-}
-
-.layer-table tr:hover td {
-  background: rgba(255, 255, 255, 0.02);
-}
-
-.table-input {
-  width: 100%;
-  padding: 3px 5px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 4px;
-  font-size: 9px;
-  background: rgba(0, 0, 0, 0.2);
-  color: #e5e7eb;
-  transition: all 0.15s ease;
-}
-
-.table-input:focus {
-  outline: none;
-  border-color: rgba(129, 140, 248, 0.4);
-  background: rgba(0, 0, 0, 0.25);
-}
-
-.table-input::placeholder {
-  color: #6b7280;
-}
-
-.table-input.narrow {
-  width: 45px;
-}
-
-.table-input.wide {
-  min-width: 70px;
-}
-
-.table-select {
-  padding: 3px 5px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 4px;
-  font-size: 9px;
-  min-width: 38px;
-  background: rgba(0, 0, 0, 0.2);
-  color: #e5e7eb;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.table-select:focus {
-  outline: none;
-  border-color: rgba(129, 140, 248, 0.4);
-}
-
-.table-select option {
-  background: #1f2937;
-  color: #e5e7eb;
-}
-
-.remove-btn {
-  width: 18px;
-  height: 18px;
-  border: none;
-  background: rgba(248, 113, 113, 0.15);
-  color: #f87171;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 12px;
-  line-height: 1;
-  padding: 0;
-  transition: all 0.15s ease;
-}
-
-.remove-btn:hover {
-  background: rgba(248, 113, 113, 0.25);
-  color: #fca5a5;
-}
-
-.empty-row {
-  text-align: center;
-  color: #6b7280;
-  padding: 16px !important;
-}
-
-/* 表格操作 */
-.table-actions {
-  margin-top: 6px;
-  flex-shrink: 0;
-}
-
-.table-actions.compact {
-  margin-top: 5px;
-  flex-shrink: 0;
-}
-
-.add-layer-btn {
-  width: 100%;
-  padding: 6px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px dashed rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
-  color: #9ca3af;
-  font-size: 10px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.add-layer-btn:hover {
-  background: rgba(129, 140, 248, 0.08);
-  border-color: rgba(129, 140, 248, 0.3);
-  color: #a5b4fc;
-}
-
-/* 表格区块 */
-.table-section {
-  display: flex;
-  flex-direction: column;
-}
-
-.table-section.layers {
-  flex: 1 1 0;
-  min-height: 130px;
-  display: flex;
-  flex-direction: column;
-}
-
-.table-section.temperature {
-  flex: 0 0 auto;
-}
-
-/* 温度剖面表格 */
-.temperature-table {
-  margin-top: 0;
-  border-top: none;
-  padding-top: 0;
-}
-
-.temperature-table.in-panel {
-  flex: 0 0 auto;
-}
-
-.temperature-table .table-title {
-  color: #f87171;
-}
-
-.temperature-table .layer-table {
-  width: 100%;
+/* Temperature Table Styling */
+.temperature-table th {
+  color: var(--temp-color);
 }
 
 .temperature-table .table-input {
-  width: 70px;
-}
-
-.temperature-table th {
-  color: #f87171;
-}
-
-/* 表格标题扩展 */
-.table-title {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 6px 8px;
-  background: rgba(255, 255, 255, 0.04);
-  font-size: 10px;
-  font-weight: 600;
-  color: #e5e7eb;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.depth-info {
-  font-weight: normal;
-  font-size: 9px;
-  color: #9ca3af;
-}
-
-.depth-info .remaining {
-  color: #818cf8;
-}
-
-.depth-info .overflow {
-  color: #f87171;
-  font-weight: 600;
-}
-
-/* 深度范围列 */
-.depth-range {
-  font-weight: 600;
-  color: #818cf8;
-  font-size: 8px;
-  white-space: nowrap;
-}
-
-/* 厚度列（自动计算） */
-.thickness-cell {
+  color: var(--temp-color);
   font-weight: 500;
-  color: #9ca3af;
-  font-size: 9px;
-  text-align: center;
+}
+
+/* ========== Preview Mode ========== */
+.snow-profile-section.preview-mode {
+  background: white;
+  border: none;
+  border-radius: 0;
+}
+
+.preview-layout {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  height: 100%;
+}
+
+.preview-chart-area {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+}
+
+.preview-data-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.preview-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.preview-table th {
+  background: #f1f5f9;
+  color: #475569;
+  padding: 6px 8px;
+  text-align: left;
+  border: 1px solid #e2e8f0;
+}
+
+.preview-table td {
+  padding: 4px 8px;
+  border: 1px solid #e2e8f0;
+  color: #1e293b;
+}
+
+.preview-table.temp-table th {
+  color: var(--temp-color);
+  background: var(--info-bg);
+}
+
+.preview-table.temp-table td {
+  color: var(--temp-color);
+}
+
+/* Preview mode overrides */
+.preview-mode .temp-tick {
+  color: var(--temp-color);
+}
+
+.preview-mode .depth-tick {
+  color: #475569;
+}
+
+.preview-mode .chart-area {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+.preview-mode .grid-line.horizontal,
+.preview-mode .grid-line.vertical {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.preview-mode .layer-label {
+  color: #1e293b;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.preview-mode .hardness-tick {
+  color: #475569;
+}
+
+.preview-mode .depth-label {
+  color: #64748b;
+}
+
+/* ========== Section Title ========== */
+.section-title {
+  display: none;
+}
+
+/* ========== Profile Card ========== */
+.profile-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: visible;
 }

@@ -1,7 +1,12 @@
+.rose-diagram-wrapper {
+  border-radius: 50%;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.12)) drop-shadow(0 1px 3px rgba(0, 0, 0, 0.08));
+}
+
 .rose-sec {
   stroke: #fff;
   stroke-width: 1px;
-  transition: opacity 0.1s;
+  transition: opacity 0.15s;
 }
 
 .rose-sec:hover {
@@ -9,13 +14,13 @@
 }
 
 .fill-base {
-  fill: #e9ecef;
+  fill: #e4e7ec;
 }
 
 .fill-p1 {
-  fill: #d9534f;
+  fill: #dc4540;
 }
 
 .fill-p2 {
-  fill: #f0ad4e;
+  fill: #f0a030;
 }

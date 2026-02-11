@@ -2,6 +2,7 @@ import { useEffect, useState, useRef, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useObservationStore } from '../store';
 import { useToast } from '../hooks';
+import { ConfirmDialog } from '../components/ui';
 import { observationApi, type ObservationDetail } from '../api/observation.api';
 import { exportToPng } from '../utils';
 import { SnowProfileSection } from '../components/observation';
@@ -458,53 +459,25 @@ export function ObservationListPage() {
         )}
       </div>
 
-      {/* 删除确认对话框 */}
-      {deleteConfirmId !== null && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h3>确认删除</h3>
-            <p>确定要删除这条观测记录吗？此操作不可撤销。</p>
-            <div className="modal-actions">
-              <button
-                className="modal-btn cancel"
-                onClick={() => setDeleteConfirmId(null)}
-              >
-                取消
-              </button>
-              <button
-                className="modal-btn confirm"
-                onClick={() => handleDelete(deleteConfirmId)}
-              >
-                确认删除
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmDialog
+        open={deleteConfirmId !== null}
+        title="确认删除"
+        message="确定要删除这条观测记录吗？此操作不可撤销。"
+        confirmText="确认删除"
+        variant="danger"
+        onConfirm={() => deleteConfirmId !== null && handleDelete(deleteConfirmId)}
+        onCancel={() => setDeleteConfirmId(null)}
+      />
 
-      {/* 批量删除确认对话框 */}
-      {batchDeleteConfirm && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h3>批量删除确认</h3>
-            <p>确定要删除选中的 {selectedIds.size} 条观测记录吗？此操作不可撤销。</p>
-            <div className="modal-actions">
-              <button
-                className="modal-btn cancel"
-                onClick={() => setBatchDeleteConfirm(false)}
-              >
-                取消
-              </button>
-              <button
-                className="modal-btn confirm"
-                onClick={handleBatchDelete}
-              >
-                确认删除
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmDialog
+        open={batchDeleteConfirm}
+        title="批量删除确认"
+        message={`确定要删除选中的 ${selectedIds.size} 条观测记录吗？此操作不可撤销。`}
+        confirmText="确认删除"
+        variant="danger"
+        onConfirm={handleBatchDelete}
+        onCancel={() => setBatchDeleteConfirm(false)}
+      />
 
       {/* 隐藏的报告容器用于批量导出 */}
       {exportData && (

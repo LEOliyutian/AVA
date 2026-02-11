@@ -1,0 +1,178 @@
+/* ========== WeatherChart - Professional Meteorological Chart ========== */
+.weather-chart {
+  background: var(--panel-bg, #1f2937);
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid var(--panel-border, #4b5563);
+}
+
+.chart-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary, #f9fafb);
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.chart-svg {
+  width: 100%;
+  height: auto;
+  max-height: 400px;
+}
+
+/* 轴标签 */
+.axis-label {
+  font-size: 11px;
+  fill: var(--text-tertiary, #9ca3af);
+  font-family: 'SF Mono', monospace;
+}
+
+.axis-title {
+  font-size: 11px;
+  fill: var(--text-secondary, #d1d5db);
+  font-weight: 500;
+}
+
+.station-label {
+  font-size: 11px;
+  fill: var(--text-primary, #f9fafb);
+  font-weight: 500;
+}
+
+.elevation-label {
+  font-size: 10px;
+  fill: var(--text-tertiary, #9ca3af);
+  font-family: 'SF Mono', monospace;
+}
+
+.weather-icon {
+  font-size: 16px;
+}
+
+/* 网格线 */
+.grid-lines line {
+  stroke: var(--grid-color, rgba(255, 255, 255, 0.1));
+}
+
+/* 图例 */
+.chart-legend {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--panel-border, #4b5563);
+}
+
+.legend-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.legend-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-tertiary, #9ca3af);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-secondary, #d1d5db);
+}
+
+.legend-line {
+  width: 20px;
+  height: 3px;
+  border-radius: 2px;
+}
+
+.legend-line.dashed {
+  background: repeating-linear-gradient(
+    90deg,
+    currentColor 0,
+    currentColor 6px,
+    transparent 6px,
+    transparent 9px
+  ) !important;
+  height: 2px;
+}
+
+.legend-bar {
+  width: 12px;
+  height: 16px;
+  border-radius: 2px;
+}
+
+/* 空状态 */
+.weather-chart-empty {
+  background: var(--panel-bg, #1f2937);
+  border-radius: 12px;
+  padding: 60px 20px;
+  border: 1px solid var(--panel-border, #4b5563);
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+.weather-chart-empty p {
+  font-size: 14px;
+  color: var(--text-tertiary, #9ca3af);
+  margin: 0;
+}
+
+/* Light theme overrides */
+[data-theme="light"] .weather-chart,
+[data-theme="light"] .weather-chart-empty {
+  background: #ffffff;
+  border-color: #e5e7eb;
+}
+
+[data-theme="light"] .chart-title {
+  color: #1f2937;
+}
+
+[data-theme="light"] .axis-label {
+  fill: #6b7280;
+}
+
+[data-theme="light"] .axis-title {
+  fill: #4b5563;
+}
+
+[data-theme="light"] .station-label {
+  fill: #1f2937;
+}
+
+[data-theme="light"] .elevation-label {
+  fill: #6b7280;
+}
+
+[data-theme="light"] .grid-lines line {
+  stroke: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .legend-title {
+  color: #6b7280;
+}
+
+[data-theme="light"] .legend-item {
+  color: #4b5563;
+}
+
+[data-theme="light"] .chart-legend {
+  border-color: #e5e7eb;
+}
+
+[data-theme="light"] .weather-chart-empty p {
+  color: #6b7280;
+}
