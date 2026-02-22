@@ -83,9 +83,8 @@ Built with a performance-first architecture, AVA combines a responsive **React**
 
 > 专业级雪崩风险评估与管理系统
 
-**AVA** 是一个为雪崩预报员设计的现代化 Web 应用程序，致力于提供高效的数据录入、风险分析和可视化工具。它帮助专业人员更准确地评估雪层稳定性，并高效传达雪崩危险等级。
+**AVA** 是一个为雪崩预报员，雪崩安全知识的学习者设计的 Web 应用程序，致力于提供高效的数据录入、风险分析和可视化工具、以及相关的雪崩安全教育内容。它帮助专业人员更准确地评估雪层稳定性，并高效传达雪崩危险等级，也帮助雪崩安全学习者更高效的学习。
 
-项目采用高性能架构构建，结合了 **React** 前端的灵活性与 **Node.js** 后端的稳定性，确保关键业务的可靠运行。
 
 ### ✨ 核心功能
 
@@ -111,7 +110,7 @@ Built with a performance-first architecture, AVA combines a responsive **React**
 
 #### 后端 (Server)
 - **运行环境**：Node.js + Express
-- **数据库**：SQLite (使用 `better-sqlite3`)，轻量且高效
+- **数据库**：SQLite (使用 `better-sqlite3`)
 - **安全机制**：JWT 认证, Bcrypt 加密, Helmet 安全防护
 
 ---
