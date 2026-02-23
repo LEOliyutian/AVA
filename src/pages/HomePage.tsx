@@ -65,17 +65,13 @@ export function HomePage() {
   const getDangerLabel = (level: number) => {
     const config = DANGER_CONFIG[level as keyof typeof DANGER_CONFIG];
     if (!config) return { cn: '未知', en: 'Unknown' };
-    const labels: Record<number, { cn: string; en: string }> = {
-      1: { cn: '低风险', en: 'Low' },
-      2: { cn: '中等风险', en: 'Moderate' },
-      3: { cn: '显著危险', en: 'Considerable' },
-      4: { cn: '高危', en: 'High' },
-      5: { cn: '极端危险', en: 'Extreme' },
-    };
-    return labels[level] || { cn: '未知', en: 'Unknown' };
+    // label format: "N 中文标签 English" e.g. "3 较高风险 Considerable"
+    const parts = config.label.split(' ');
+    return { cn: parts[1] || '未知', en: parts[2] || 'Unknown' };
   };
 
-  const formatDate = (dateStr: string) => {
+  const formatDate = (dateStr: string | null) => {
+    if (!dateStr) return '-';
     const date = new Date(dateStr);
     return date.toLocaleDateString('zh-CN', {
       year: 'numeric',
@@ -170,6 +166,11 @@ export function HomePage() {
                       <path d="M5 12h14M12 5l7 7-7 7" />
                     </svg>
                   </Link>
+                  {isForecaster && (
+                    <Link to="/editor" className="btn-secondary" style={{ marginLeft: '12px' }}>
+                      <span>+ 发布新预报</span>
+                    </Link>
+                  )}
                 </div>
               </>
             ) : (
@@ -295,23 +296,34 @@ export function HomePage() {
           )}
         </section>
 
-        {/* 近期预报 (Moved from below) */}
+        {/* 近期预报 */}
         <section className="forecasts-section" style={{ marginBottom: '64px' }}>
           <div className="section-header-row" style={{ justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1 }}>
               <h3 className="section-title-sm">近期预报记录</h3>
               <div className="header-line"></div>
             </div>
-            <button
-              className="btn-secondary"
-              onClick={() => setShowRiskModal(true)}
-              style={{ padding: '8px 16px', fontSize: '13px' }}
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px', width: '16px', height: '16px' }}>
-                <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              风险等级说明
-            </button>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              {isForecaster && (
+                <Link
+                  to="/editor"
+                  className="btn-primary"
+                  style={{ padding: '8px 16px', fontSize: '13px' }}
+                >
+                  + 新建预报
+                </Link>
+              )}
+              <button
+                className="btn-secondary"
+                onClick={() => setShowRiskModal(true)}
+                style={{ padding: '8px 16px', fontSize: '13px' }}
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px', width: '16px', height: '16px' }}>
+                  <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                风险等级说明
+              </button>
+            </div>
           </div>
 
           {recentForecasts.length > 0 ? (
@@ -369,141 +381,47 @@ export function HomePage() {
           )}
         </section>
 
-        {/* 双栏布局 */}
-        <div className="content-grid">
-          {/* 左侧主内容 */}
-          <div className="main-content">
-
-            {/* 雪层观测记录 (Mock Data) */}
-            <section className="observations-section" style={{ marginTop: '48px' }}>
-              <div className="section-header-row">
-                <h3 className="section-title-sm">最新雪层观测</h3>
-                <div className="header-line"></div>
-              </div>
-
-              <div className="bento-card">
-                <table className="forecast-table">
-                  <thead>
-                    <tr>
-                      <th>观测日期</th>
-                      <th>区域/地点</th>
-                      <th>海拔/朝向</th>
-                      <th>观测员</th>
-                      <th>稳定性评估</th>
-                      <th className="text-right">详情</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {recentObservations.map((obs) => (
-                      <tr key={obs.id}>
-                        <td>{obs.observation_date}</td>
-                        <td style={{ fontWeight: 600 }}>{obs.location_description || '-'}</td>
-                        <td>{obs.elevation || '-'} / {obs.slope_aspect || '-'}</td>
-                        <td>{obs.observer || obs.observer_name || '-'}</td>
-                        <td>
-                          <span className={`status-badge status-${getStability(obs.id).toLowerCase()}`}>
-                            {getStability(obs.id)}
-                          </span>
-                        </td>
-                        <td className="text-right">
-                          <Link to={`/observations/${obs.id}`} className="table-link">查看</Link>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-
-            {/* 安全教育 - 横向卡片设计 */}
-            <section className="education-section" style={{ marginTop: '48px' }}>
-              <div className="edu-card-horizontal">
-                <div className="edu-image">
-                  <img
-                    src="https://images.unsplash.com/photo-1551524559-8af4e6624178?w=800&q=80"
-                    alt="Avalanche Safety Training"
-                  />
-                  <div className="edu-overlay">
-                    <span className="card-tag">教育课程</span>
-                  </div>
-                </div>
-                <div className="edu-content">
-                  <div>
-                    <h4 className="edu-title">雪崩安全知识在线学习平台</h4>
-                    <p className="edu-desc">
-                      专为滑雪爱好者设计的系统化雪崩安全培训课程。包含以下模块：
-                    </p>
-                    <ul className="edu-list">
-                      <li>雪崩地形识别与评估</li>
-                      <li>雪层不稳定性测试方法</li>
-                      <li>救援设备使用实操指南 (Beacon/Probe/Shovel)</li>
-                    </ul>
-                  </div>
-                  <div className="edu-actions">
-                    <button className="btn-primary" disabled style={{ padding: '12px 24px', fontSize: '14px' }}>
-                      平台即将上线
-                    </button>
-                    <span className="edu-note">预计 2024 冬季开放</span>
-                  </div>
-                </div>
-              </div>
-            </section>
+        {/* 雪层观测记录 */}
+        <section className="observations-section" style={{ marginBottom: '64px' }}>
+          <div className="section-header-row">
+            <h3 className="section-title-sm">最新雪层观测</h3>
+            <div className="header-line"></div>
           </div>
 
-          {/* 右侧边栏 */}
-          <div className="sidebar">
-            {/* 安全检查清单 */}
-            <div className="sidebar-card checklist-card">
-              <h4 className="checklist-title">
-                <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-                  <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" />
-                </svg>
-                出发前安全自查
-              </h4>
-              <div className="checklist-items">
-                <div className="check-item">
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="check-icon">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-                  </svg>
-                  <div className="check-content">
-                    <p className="check-title">收发器电池</p>
-                    <p className="check-desc">确保电量在 70% 以上且功能正常</p>
-                  </div>
-                </div>
-                <div className="check-item">
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="check-icon">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-                  </svg>
-                  <div className="check-content">
-                    <p className="check-title">行程计划共享</p>
-                    <p className="check-desc">告知留守人员详细的进山与回程时间</p>
-                  </div>
-                </div>
-                <div className="check-item">
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="check-icon">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-                  </svg>
-                  <div className="check-content">
-                    <p className="check-title">救援三件套</p>
-                    <p className="check-desc">探测杆与雪铲应在背囊中处于易取位置</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* CTA 卡片 */}
-            <div className="sidebar-card cta-card">
-              <div className="cta-bg-icon">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
-                </svg>
-              </div>
-              <h4>专业机构对接</h4>
-              <p>为雪场及滑雪俱乐部提供专业级雪崩安全管理咨询与数据支持。</p>
-              <button className="btn-cta">联系专业团队</button>
-            </div>
+          <div className="bento-card">
+            <table className="forecast-table">
+              <thead>
+                <tr>
+                  <th>观测日期</th>
+                  <th>区域/地点</th>
+                  <th>海拔/朝向</th>
+                  <th>观测员</th>
+                  <th>稳定性评估</th>
+                  <th className="text-right">详情</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentObservations.map((obs) => (
+                  <tr key={obs.id}>
+                    <td>{formatDate(obs.observation_date)}</td>
+                    <td style={{ fontWeight: 600 }}>{obs.location_description || '-'}</td>
+                    <td>{obs.elevation || '-'} / {obs.slope_aspect || '-'}</td>
+                    <td>{obs.observer || obs.observer_name || '-'}</td>
+                    <td>
+                      <span className={`status-badge status-${getStability(obs.id).toLowerCase()}`}>
+                        {getStability(obs.id)}
+                      </span>
+                    </td>
+                    <td className="text-right">
+                      <Link to={`/observations/${obs.id}`} className="table-link">查看</Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        </div>
+        </section>
+
       </main>
 
       <Modal
@@ -604,7 +522,7 @@ export function HomePage() {
             <p className="footer-desc">
               专业雪崩安全助手平台。我们结合高精度实地观测与专业分析，致力于提高野外滑雪的安全性。
             </p>
-            <p className="footer-copyright">© 2024 TaigaSnow</p>
+            <p className="footer-copyright">© {new Date().getFullYear()} TaigaSnow</p>
           </div>
 
           <div className="footer-nav">
@@ -619,16 +537,13 @@ export function HomePage() {
           <div className="footer-nav">
             <h4>安全中心</h4>
             <nav>
-              <a href="#levels">风险等级说明</a>
-              <a href="#">救援操作指南</a>
-            </nav>
-          </div>
-
-          <div className="footer-nav">
-            <h4>联系我们</h4>
-            <nav>
-              <a href="#">技术支持</a>
-              <a href="#">意见反馈</a>
+              <Link to="/safety">安全知识</Link>
+              <Link to="/safety/problem-types">雪崩问题类型</Link>
+              <Link to="/safety/danger-scale">风险等级说明</Link>
+              <Link to="/safety/terrain">地形管理指南</Link>
+              <Link to="/safety/crystal-types">雪晶类型与变质</Link>
+              <Link to="/safety/rescue">救援与自救</Link>
+              <Link to="/safety/decision">出行决策框架</Link>
             </nav>
           </div>
         </div>

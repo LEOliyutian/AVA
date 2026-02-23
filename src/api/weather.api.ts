@@ -37,6 +37,8 @@ export interface StationObservationApi {
   snow_depth: number;
   hst?: number;
   h24?: number;
+  hin?: number;
+  foot_penetration?: number;
 }
 
 // 气象观测详情（API 响应格式）
@@ -79,7 +81,15 @@ export const weatherApi = {
       if (params?.page) queryParams.set('page', params.page.toString());
       if (params?.limit) queryParams.set('limit', params.limit.toString());
 
-      const response = await apiClient.get(`/weather-observations?${queryParams.toString()}`);
+      const response = await apiClient.get<{
+        observations: WeatherObservationListItem[];
+        pagination: {
+          page: number;
+          limit: number;
+          total: number;
+          totalPages: number;
+        };
+      }>(`/weather-observations?${queryParams.toString()}`);
       return response;
     } catch (error: any) {
       return {
@@ -158,7 +168,10 @@ export const weatherApi = {
       if (params?.days) queryParams.set('days', params.days.toString());
       if (params?.station) queryParams.set('station', params.station);
 
-      const response = await apiClient.get(`/weather-observations/trends?${queryParams.toString()}`);
+      const response = await apiClient.get<{
+        records: WeatherObservationDetail[];
+        stations: string[];
+      }>(`/weather-observations/trends?${queryParams.toString()}`);
       return response;
     } catch (error: any) {
       return {

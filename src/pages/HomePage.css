@@ -904,11 +904,13 @@
   border: 1px solid var(--accent-light-bg);
   border-radius: 16px;
   overflow: hidden;
-  transition: all 0.3s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: var(--accent-glow-sm);
+  will-change: transform, box-shadow;
 }
 
 .sidebar-card:hover {
+  transform: translateY(-4px) scale(1.02);
   box-shadow: var(--accent-glow-lg);
   border-color: var(--accent-light-bg);
 }
@@ -1362,49 +1364,6 @@
   .levels-grid {
     grid-template-columns: 1fr;
   }
-}
-
-/* === 深色模式适配 === */
-[data-theme="dark"] .hero-gradient {
-  background: linear-gradient(to right, rgba(15, 23, 42, 1) 55%, rgba(15, 23, 42, 0) 100%);
-}
-
-[data-theme="dark"] .panel-card {
-  background: rgba(30, 41, 59, 0.95);
-  border-color: var(--border-color);
-}
-
-[data-theme="dark"] .forecast-table thead tr {
-  background: rgba(15, 23, 42, 0.5);
-}
-
-[data-theme="dark"] .feature-card.highlight {
-  background: linear-gradient(135deg, #0c4a6e 0%, #0369a1 100%);
-  border-color: var(--accent-hover);
-}
-
-[data-theme="dark"] .sidebar-card.checklist-card {
-  background: rgba(15, 23, 42, 0.5);
-}
-
-[data-theme="dark"] .btn-secondary {
-  background: rgba(55, 65, 81, 0.8);
-}
-
-.sidebar-card {
-  background: var(--bg-card);
-  border-radius: 16px;
-  border: 1px solid var(--border-color);
-  overflow: hidden;
-  margin-bottom: 24px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: transform, box-shadow;
-}
-
-.sidebar-card:hover {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: var(--shadow-md);
-  border-color: var(--accent-light-bg);
 }
 
 /* === Horizontal Education Card === */

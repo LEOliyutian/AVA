@@ -6,6 +6,7 @@ interface AuthState {
   user: SafeUser | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  _hasHydrated: boolean;
   error: string | null;
 }
 
@@ -24,7 +25,8 @@ export const useAuthStore = create<AuthStore>()(
     (set, get) => ({
       user: null,
       isAuthenticated: false,
-      isLoading: false,
+      isLoading: true, // 初始为 true，等待 hydrate + token 验证
+      _hasHydrated: false,
       error: null,
 
       login: async (username, password) => {
@@ -82,34 +84,44 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       checkAuth: async () => {
-        console.log('checkAuth called');
         const token = localStorage.getItem('auth_token');
         if (!token) {
-          console.log('No token found');
           set({ user: null, isAuthenticated: false, isLoading: false });
           return;
         }
 
         set({ isLoading: true });
-        console.log('Getting user info...');
         const result = await authApi.getMe();
 
         if (result.success && result.data) {
-          console.log('User info loaded:', result.data.user);
           set({
             user: result.data.user,
             isAuthenticated: true,
             isLoading: false,
           });
         } else {
-          console.log('Token invalid, clearing auth');
-          // 简化处理：直接清除状态，不尝试刷新
+          // Token 无效，尝试刷新
+          const refreshResult = await authApi.refresh();
+          if (refreshResult.success) {
+            // 刷新成功，重新获取用户信息
+            const retryResult = await authApi.getMe();
+            if (retryResult.success && retryResult.data) {
+              set({
+                user: retryResult.data.user,
+                isAuthenticated: true,
+                isLoading: false,
+              });
+              return;
+            }
+          }
+          // 刷新也失败，清除认证状态
           set({
             user: null,
             isAuthenticated: false,
             isLoading: false,
           });
           localStorage.removeItem('auth_token');
+          localStorage.removeItem('refresh_token');
         }
       },
 
@@ -121,6 +133,20 @@ export const useAuthStore = create<AuthStore>()(
         user: state.user,
         isAuthenticated: state.isAuthenticated,
       }),
+      onRehydrateStorage: () => {
+        return (state) => {
+          if (state) {
+            state._hasHydrated = true;
+            // hydrate 完成后，如果之前有认证状态，验证 token
+            if (state.isAuthenticated) {
+              state.checkAuth();
+            } else {
+              // 没有认证状态，直接结束 loading
+              useAuthStore.setState({ isLoading: false });
+            }
+          }
+        };
+      },
     }
   )
 );

@@ -87,6 +87,7 @@ export interface ObservationListItem {
   location_description: string | null;
   observer: string | null;
   observation_date: string | null;
+  gps_coordinates: string | null;
   elevation: string | null;
   slope_aspect: string | null;
   total_snow_depth: string | null;

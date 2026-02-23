@@ -32,6 +32,16 @@ function formatNum(val: number | '' | undefined, suffix = ''): string {
   return `${val}${suffix}`;
 }
 
+// 风速等级
+function getWindScale(speed: number | ''): string {
+  if (speed === '' || speed <= 0) return '平静 Calm';
+  if (speed <= 1) return '平静 Calm';
+  if (speed <= 12) return '轻风 Light';
+  if (speed <= 30) return '中等风 Moderate';
+  if (speed <= 50) return '强风 Strong';
+  return '极端风 Extreme';
+}
+
 // 站点数据卡片
 function StationCard({ station }: { station: StationEditorState }) {
   return (
@@ -59,6 +69,9 @@ function StationCard({ station }: { station: StationEditorState }) {
             <span className="wind-direction">{station.windDirection}</span>
             <span className="wind-speed">{formatNum(station.windSpeed, ' km/h')}</span>
           </div>
+          {station.windSpeed !== '' && (
+            <div className="wind-scale-tag">{getWindScale(station.windSpeed)}</div>
+          )}
           {station.blowingSnow && station.blowingSnow !== '无' && (
             <div className="blowing-tag">风吹雪: {station.blowingSnow}</div>
           )}
@@ -92,21 +105,29 @@ function StationCard({ station }: { station: StationEditorState }) {
               <span className="grain-size">{station.grainSize}mm</span>
             )}
           </div>
+          {station.footPenetration !== '' && station.footPenetration !== undefined && (
+            <div className="foot-penetration-tag" title="Foot Penetration (踏陷深度)">
+              踏陷: {station.footPenetration}cm
+            </div>
+          )}
         </div>
 
         {/* 雪深 */}
         <div className="data-block snow-depth-block">
           <div className="data-label">雪深</div>
           <div className="snow-depth-value">
-            <span className="hs-value">{formatNum(station.snowDepth)}</span>
+            <span className="hs-value" title="HS = Height of Snow (总雪深)">{formatNum(station.snowDepth)}</span>
             <span className="hs-unit">cm</span>
           </div>
           <div className="snow-extra">
             {station.hst !== '' && station.hst !== undefined && (
-              <span>HST: {station.hst}cm</span>
+              <span title="HST = Height of Storm snow Total (暴雪总量)">HST: {station.hst}cm</span>
             )}
             {station.h24 !== '' && station.h24 !== undefined && (
-              <span>H24: {station.h24}cm</span>
+              <span title="H24 = 24-hour New Snow (24小时新雪)">H24: {station.h24}cm</span>
+            )}
+            {station.hin !== '' && station.hin !== undefined && (
+              <span title="HIN = Height of New snow Interval (观测间隔新雪)">HIN: {station.hin}cm</span>
             )}
           </div>
         </div>

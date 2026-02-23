@@ -1,0 +1,257 @@
+/* DangerScalePage */
+
+.danger-scale-header {
+  margin-bottom: 40px;
+}
+
+.danger-scale-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+  text-decoration: none;
+  margin-bottom: 20px;
+  transition: gap 0.2s;
+}
+
+.danger-scale-back:hover {
+  gap: 12px;
+}
+
+.danger-scale-back svg {
+  width: 18px;
+  height: 18px;
+}
+
+.danger-scale-title {
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--text-primary);
+  margin: 0 0 12px;
+  letter-spacing: -0.025em;
+}
+
+.danger-scale-subtitle {
+  font-size: 15px;
+  color: var(--text-muted);
+  line-height: 1.7;
+  max-width: 640px;
+  margin: 0;
+}
+
+/* Scale bar section */
+.danger-scale-bar-section {
+  margin-bottom: 48px;
+}
+
+/* Level cards */
+.danger-scale-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-bottom: 64px;
+}
+
+.danger-scale-card {
+  background: var(--bg-card);
+  border: 1px solid var(--accent-light-bg);
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: var(--accent-glow-sm);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.danger-scale-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--level-color);
+}
+
+.danger-scale-card:hover {
+  box-shadow: var(--accent-glow-md);
+  transform: translateX(4px);
+  border-color: var(--level-color);
+}
+
+.danger-scale-card-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.danger-scale-badge {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 900;
+  color: white;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.danger-scale-names h2 {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.danger-scale-names span {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.danger-scale-stability {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0 0 20px;
+}
+
+/* Info grid */
+.danger-scale-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.danger-scale-item {
+  background: var(--bg-input);
+  border-radius: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--border-light);
+}
+
+.danger-scale-item h4 {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.danger-scale-item p {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Tips */
+.danger-scale-tips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.danger-scale-tip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-muted);
+  background: var(--bg-input);
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+}
+
+.danger-scale-tip-icon {
+  font-size: 16px;
+}
+
+/* Usage guide */
+.danger-scale-guide {
+  background: var(--bg-card);
+  border: 1px solid var(--accent-light-bg);
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: var(--accent-glow-sm);
+}
+
+.danger-scale-guide h3 {
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--text-primary);
+  margin: 0 0 28px;
+}
+
+.danger-scale-guide-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.danger-scale-guide-item {
+  background: var(--bg-input);
+  border-radius: 12px;
+  padding: 24px;
+  border: 1px solid var(--border-light);
+}
+
+.danger-scale-guide-item h4 {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 8px;
+}
+
+.danger-scale-guide-item p {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .danger-scale-guide-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .danger-scale-title {
+    font-size: 24px;
+  }
+
+  .danger-scale-card {
+    padding: 24px;
+  }
+
+  .danger-scale-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .danger-scale-guide {
+    padding: 24px;
+  }
+
+  .danger-scale-tips {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .danger-scale-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

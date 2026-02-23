@@ -22,11 +22,18 @@ function ensureDatabase() {
     process.exit(1);
   }
 
-  // 测试数据库连接
+  // 测试数据库连接并确保所有 schema 已应用
   try {
     const db = getDatabase();
     db.prepare('SELECT 1').get();
     console.log('数据库连接成功');
+
+    // 自动应用新增的 schema（CREATE TABLE IF NOT EXISTS 是安全的）
+    const avalancheEventsSchema = fs.readFileSync(
+      path.resolve(__dirname, 'db/avalanche-events-schema.sql'),
+      'utf-8'
+    );
+    db.exec(avalancheEventsSchema);
   } catch (error) {
     console.error('数据库连接失败:', error);
     process.exit(1);

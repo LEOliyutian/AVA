@@ -41,6 +41,7 @@ export function getObservations(options: {
       o.location_description,
       o.observer,
       o.observation_date,
+      o.gps_coordinates,
       o.elevation,
       o.slope_aspect,
       o.total_snow_depth,

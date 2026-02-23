@@ -37,7 +37,29 @@
       "WebSearch",
       "WebFetch(domain:avalanche.org)",
       "WebFetch(domain:www.avalanches.org)",
-      "WebFetch(domain:avalanche.state.co.us)"
+      "WebFetch(domain:avalanche.state.co.us)",
+      "Bash(cd:*)",
+      "Bash(git -C \"D:\\\\code\\\\eg\\\\avalanche-forecast\" log --oneline -10)",
+      "Bash(git -C \"D:\\\\code\\\\eg\\\\avalanche-forecast\" diff HEAD~1 src/pages/ForecastEditorPage.tsx)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:outmap.pro)",
+      "WebFetch(domain:mattruta.com)",
+      "WebFetch(domain:geomatico.es)",
+      "WebFetch(domain:www.skiresort.info)",
+      "WebFetch(domain:getslopes.com)",
+      "WebFetch(domain:www.trip.com)",
+      "Bash(findstr:*)",
+      "Bash(del \"D:\\\\code\\\\eg\\\\avalanche-forecast\\\\src\\\\utils\\\\terrain-provider.ts\")",
+      "WebFetch(domain:cesium.com)",
+      "Bash(netstat:*)",
+      "Bash(taskkill:*)",
+      "Bash(pip show:*)",
+      "Bash(py:*)",
+      "Bash(ls:*)",
+      "Bash(npx pandoc:*)",
+      "Bash(winget install:*)",
+      "Bash(unzip:*)",
+      "Bash(/tmp/pandoc-extract/pandoc-3.6.4/pandoc.exe:*)"
     ]
   }
 }

@@ -245,10 +245,26 @@
   color: #86868b;
 }
 
+.wind-scale-tag {
+  margin-top: 4px;
+  font-size: 10px;
+  padding: 1px 6px;
+  background: #f0f9ff;
+  color: #0369a1;
+  border-radius: 8px;
+  display: inline-block;
+}
+
 .blowing-tag {
   margin-top: 6px;
   font-size: 10px;
   color: #dc2626;
+}
+
+.foot-penetration-tag {
+  margin-top: 6px;
+  font-size: 10px;
+  color: #6b7280;
 }
 
 /* Temperature Block */

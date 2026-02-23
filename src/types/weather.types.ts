@@ -79,6 +79,8 @@ export interface StationObservation {
   snowDepth: number;          // 雪深 HS (cm)
   hst?: number;               // 暴雪总量
   h24?: number;               // 24小时新雪
+  hin?: number;               // 观测间隔新雪
+  footPenetration?: number;   // 踏陷深度
 }
 
 // 气象观测记录（支持动态站点列表）
@@ -87,7 +89,8 @@ export interface WeatherObservation {
   recorder: string;           // 记录员
   tempMin: number;            // 最低气温
   tempMax: number;            // 最高气温
-  stations: StationObservation[];  // 动态站点列表
+  upperStation: StationObservation;
+  lowerStation: StationObservation;
 }
 
 // 天气数据 (用于预报显示)

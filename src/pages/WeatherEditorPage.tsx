@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useWeatherStore } from '../store';
 import { useToast } from '../hooks';
-import { useTheme } from '../contexts/ThemeContext';
 import { ConfirmDialog } from '../components/ui';
 import { exportToPng } from '../utils';
 import {
@@ -16,14 +15,11 @@ export function WeatherEditorPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { success, error } = useToast();
-  const { theme, toggleTheme } = useTheme();
 
   const {
-    currentId,
     editor,
     isEditorLoading,
     isSaving,
-    editorError,
     isDirty,
     loadObservation,
     resetEditor,
@@ -143,13 +139,6 @@ export function WeatherEditorPage() {
           {isDirty && <span className="dirty-dot">●</span>}
         </div>
         <div className="toolbar-actions">
-          <button
-            className="toolbar-btn theme-toggle"
-            onClick={toggleTheme}
-            title={theme === 'dark' ? '切换亮色模式' : '切换深色模式'}
-          >
-            {theme === 'dark' ? '☀' : '☾'}
-          </button>
           {!showPreview && (
             <button
               className={`toolbar-btn toggle-sidebar ${sidebarOpen ? 'active' : ''}`}

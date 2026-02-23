@@ -18,6 +18,8 @@ export interface StationData {
   snow_depth: number;
   hst?: number;
   h24?: number;
+  hin?: number;
+  foot_penetration?: number;
 }
 
 export interface WeatherObservationInput {
@@ -117,7 +119,9 @@ class WeatherService {
         blowing_snow,
         snow_depth,
         hst,
-        h24
+        h24,
+        hin,
+        foot_penetration
       FROM weather_station_data
       WHERE observation_id = ?
       ORDER BY sort_order, elevation DESC
@@ -159,8 +163,8 @@ class WeatherService {
         INSERT INTO weather_station_data (
           observation_id, name, elevation, observation_time, cloud_cover, precipitation,
           wind_direction, wind_speed, grain_size, surface_snow_type,
-          temp_10cm, temp_surface, temp_air, blowing_snow, snow_depth, hst, h24, sort_order
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          temp_10cm, temp_surface, temp_air, blowing_snow, snow_depth, hst, h24, hin, foot_penetration, sort_order
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `);
 
       data.stations.forEach((station, index) => {
@@ -182,6 +186,8 @@ class WeatherService {
           station.snow_depth,
           station.hst || null,
           station.h24 || null,
+          station.hin || null,
+          station.foot_penetration || null,
           index
         );
       });
@@ -214,8 +220,8 @@ class WeatherService {
         INSERT INTO weather_station_data (
           observation_id, name, elevation, observation_time, cloud_cover, precipitation,
           wind_direction, wind_speed, grain_size, surface_snow_type,
-          temp_10cm, temp_surface, temp_air, blowing_snow, snow_depth, hst, h24, sort_order
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          temp_10cm, temp_surface, temp_air, blowing_snow, snow_depth, hst, h24, hin, foot_penetration, sort_order
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `);
 
       data.stations.forEach((station, index) => {
@@ -237,6 +243,8 @@ class WeatherService {
           station.snow_depth,
           station.hst || null,
           station.h24 || null,
+          station.hin || null,
+          station.foot_penetration || null,
           index
         );
       });
@@ -277,7 +285,7 @@ class WeatherService {
         observation_time as time, cloud_cover, precipitation,
         wind_direction, wind_speed, grain_size, surface_snow_type,
         temp_10cm, temp_surface, temp_air, blowing_snow,
-        snow_depth, hst, h24
+        snow_depth, hst, h24, hin, foot_penetration
       FROM weather_station_data
       WHERE observation_id IN (${placeholders})
     `;

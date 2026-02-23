@@ -1,13 +1,12 @@
-import { useEffect, useState, useRef, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useEffect, useState, useRef } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { forecastApi, type ForecastDetail, type CreateForecastRequest } from '../api';
 import { useForecastStore } from '../store/forecast.store';
-import { useAuthStore, useCanEdit } from '../store/auth.store';
-import { useTheme } from '../contexts/ThemeContext';
-import { ConfirmDialog } from '../components/ui';
+import { useCanEdit } from '../store/auth.store';
 import { Sidebar } from '../components/sidebar';
 import { ReportSheet } from '../components/report';
 import { useDangerLevels } from '../store/selectors';
+import type { DangerTrend } from '../types';
 import './ForecastEditorPage.css';
 
 export function ForecastEditorPage() {
@@ -19,17 +18,12 @@ export function ForecastEditorPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
   const [saveMessage, setSaveMessage] = useState('');
-  const [showPublishConfirm, setShowPublishConfirm] = useState(false);
-  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
-
   const reportRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-  const { user } = useAuthStore();
   const canEdit = useCanEdit(forecast?.forecaster_id);
   const store = useForecastStore();
   const dangerLevels = useDangerLevels();
-  const { theme, toggleTheme } = useTheme();
 
   // 加载现有预报（编辑模式）
   useEffect(() => {
@@ -49,9 +43,9 @@ export function ForecastEditorPage() {
 
         // 将数据加载到 store
         store.setDate(f.forecast_date);
-        if (f.trend_alp) store.setTrend('alp', f.trend_alp as 'increasing' | 'steady' | 'decreasing');
-        if (f.trend_tl) store.setTrend('tl', f.trend_tl as 'increasing' | 'steady' | 'decreasing');
-        if (f.trend_btl) store.setTrend('btl', f.trend_btl as 'increasing' | 'steady' | 'decreasing');
+        if (f.trend_alp) store.setTrend('alp', f.trend_alp as DangerTrend);
+        if (f.trend_tl) store.setTrend('tl', f.trend_tl as DangerTrend);
+        if (f.trend_btl) store.setTrend('btl', f.trend_btl as DangerTrend);
 
         if (f.primary_type) store.setPrimaryType(f.primary_type as any);
         if (f.primary_likelihood) store.setPrimaryLikelihood(f.primary_likelihood as any);

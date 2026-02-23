@@ -1,0 +1,62 @@
+.category-ring {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  padding: 16px 8px;
+  border-radius: 12px;
+  transition: all 0.2s;
+}
+
+.category-ring:hover {
+  background: var(--bg-hover);
+  transform: translateY(-2px);
+}
+
+.category-ring-svg {
+  width: 96px;
+  height: 96px;
+  margin-bottom: 8px;
+}
+
+.category-ring-bg {
+  stroke: var(--border-light);
+}
+
+.category-ring-progress {
+  stroke: var(--accent);
+  transition: stroke-dashoffset 0.6s ease;
+}
+
+.category-ring-percent {
+  font-size: 16px;
+  font-weight: 800;
+  fill: var(--text-primary);
+}
+
+.category-ring-count {
+  font-size: 9px;
+  font-weight: 600;
+  fill: var(--text-muted);
+}
+
+.category-ring-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.category-ring-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.category-ring-subtitle {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}

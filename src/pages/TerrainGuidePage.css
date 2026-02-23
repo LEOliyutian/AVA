@@ -1,0 +1,372 @@
+/* TerrainGuidePage */
+
+.terrain-header {
+  margin-bottom: 40px;
+}
+
+.terrain-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+  text-decoration: none;
+  margin-bottom: 20px;
+  transition: gap 0.2s;
+}
+
+.terrain-back:hover {
+  gap: 12px;
+}
+
+.terrain-back svg {
+  width: 18px;
+  height: 18px;
+}
+
+.terrain-title {
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--text-primary);
+  margin: 0 0 12px;
+  letter-spacing: -0.025em;
+}
+
+.terrain-subtitle {
+  font-size: 15px;
+  color: var(--text-muted);
+  line-height: 1.7;
+  max-width: 640px;
+  margin: 0;
+}
+
+/* Sections */
+.terrain-section {
+  background: var(--bg-card);
+  border: 1px solid var(--accent-light-bg);
+  border-radius: 16px;
+  box-shadow: var(--accent-glow-sm);
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+.terrain-section-header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 28px 32px 0;
+}
+
+.terrain-section-header h2 {
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.terrain-section-en {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.terrain-section-body {
+  padding: 20px 32px 32px;
+}
+
+.terrain-intro {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0 0 24px;
+}
+
+/* Slope Angle Cards */
+.terrain-angle-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.terrain-angle-card {
+  display: flex;
+  gap: 16px;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-input);
+}
+
+.terrain-angle-value {
+  font-size: 32px;
+  font-weight: 900;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.terrain-angle-caution .terrain-angle-value {
+  color: #f59e0b;
+}
+
+.terrain-angle-danger .terrain-angle-value {
+  color: #ef4444;
+}
+
+.terrain-angle-extreme .terrain-angle-value {
+  color: #7c2d12;
+}
+
+.terrain-angle-info h4 {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 6px;
+}
+
+.terrain-angle-info p {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Aspect Grid */
+.terrain-aspect-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.terrain-aspect-card {
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-input);
+}
+
+.terrain-aspect-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--accent-light-bg);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 900;
+  margin-bottom: 12px;
+}
+
+.terrain-aspect-card h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 8px;
+}
+
+.terrain-aspect-card p {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Terrain Traps */
+.terrain-traps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.terrain-trap-item {
+  display: flex;
+  gap: 16px;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-input);
+  transition: all 0.2s;
+}
+
+.terrain-trap-item:hover {
+  border-color: var(--accent-light-bg);
+  box-shadow: var(--accent-glow-sm);
+}
+
+.terrain-trap-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--accent-light-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.terrain-trap-icon svg {
+  width: 24px;
+  height: 24px;
+  color: var(--accent);
+}
+
+.terrain-trap-content h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 6px;
+}
+
+.terrain-trap-content p {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Terrain Matrix Table */
+.terrain-matrix-table-wrap {
+  overflow-x: auto;
+}
+
+.terrain-matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.terrain-matrix-table thead tr {
+  background: rgba(248, 250, 252, 0.5);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.terrain-matrix-table th {
+  padding: 14px 20px;
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.terrain-matrix-table tbody tr {
+  border-bottom: 1px solid var(--border-light);
+  transition: background 0.2s;
+}
+
+.terrain-matrix-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.terrain-matrix-table tbody tr:hover {
+  background: var(--bg-hover);
+}
+
+.terrain-matrix-table td {
+  padding: 16px 20px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.terrain-matrix-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 900;
+  color: white;
+}
+
+.terrain-matrix-label {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* Zone Cards */
+.terrain-zone-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.terrain-zone-card {
+  padding: 24px;
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-input);
+}
+
+.terrain-zone-badge {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  color: white;
+  padding: 4px 12px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 12px;
+}
+
+.terrain-zone-alp {
+  background: #3b82f6;
+}
+
+.terrain-zone-tl {
+  background: #10b981;
+}
+
+.terrain-zone-btl {
+  background: #8b5cf6;
+}
+
+.terrain-zone-card p {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .terrain-angle-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .terrain-title {
+    font-size: 24px;
+  }
+
+  .terrain-section-header {
+    padding: 20px 24px 0;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .terrain-section-body {
+    padding: 16px 24px 24px;
+  }
+
+  .terrain-aspect-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .terrain-trap-item {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .terrain-angle-card {
+    flex-direction: column;
+    gap: 8px;
+  }
+}

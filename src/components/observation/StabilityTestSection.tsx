@@ -1,11 +1,13 @@
 import type { DepthGroup, DepthTest, TestType } from '../../types/observation';
 import {
   TEST_TYPE_OPTIONS,
-  CRYSTAL_TYPE_OPTIONS,
+  CRYSTAL_TYPE_GROUPS,
+  CRYSTAL_TYPE_DESCRIPTIONS,
   SHEAR_QUALITY_OPTIONS,
   ECT_RESULT_OPTIONS,
   PST_PROPAGATION_OPTIONS,
 } from '../../types/observation';
+import { formatTestLabel } from '../../utils';
 import './StabilityTestSection.css';
 
 interface StabilityTestSectionProps {
@@ -244,24 +246,6 @@ export function StabilityTestSection({
     }
   };
 
-  // 生成测试摘要标签
-  const formatTestLabel = (test: DepthTest) => {
-    switch (test.type) {
-      case 'CT':
-        return `CT${test.taps || ''}${test.quality || ''}`;
-      case 'ECT':
-        const ectResult = test.result?.replace('ECT', '') || '';
-        return `ECT${ectResult}${test.taps || ''}`;
-      case 'PST':
-        const pstInfo = test.cut && test.length ? `${test.cut}/${test.length}` : '';
-        return `PST${pstInfo}${test.propagation || ''}`;
-      case 'RB':
-        return `${test.score || 'RB'}${test.quality || ''}`;
-      default:
-        return test.type;
-    }
-  };
-
   return (
     <div className="stability-test-section">
       <h3 className="section-title">稳定性测试记录</h3>
@@ -307,10 +291,14 @@ export function StabilityTestSection({
                     onChange={(e) => onUpdateGroup(group.id, 'weakLayerType', e.target.value)}
                   >
                     <option value="">选择</option>
-                    {CRYSTAL_TYPE_OPTIONS.map((opt) => (
-                      <option key={opt} value={opt}>
-                        {opt}
-                      </option>
+                    {CRYSTAL_TYPE_GROUPS.map((g) => (
+                      <optgroup key={g.label} label={g.label}>
+                        {g.types.map((opt) => (
+                          <option key={opt} value={opt} title={CRYSTAL_TYPE_DESCRIPTIONS[opt]}>
+                            {opt}
+                          </option>
+                        ))}
+                      </optgroup>
                     ))}
                   </select>
                 </div>

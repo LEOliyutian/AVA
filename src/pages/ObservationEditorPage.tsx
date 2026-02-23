@@ -2,10 +2,9 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useObservationStore } from '../store';
 import { useToast } from '../hooks';
-import { useTheme } from '../contexts/ThemeContext';
 import { ConfirmDialog } from '../components/ui';
 import { validateObservation } from '../utils/validation';
-import { exportToPng } from '../utils';
+import { exportToPng, formatTestLabel } from '../utils';
 import {
   ObservationInfoSection,
   SnowProfileSection,
@@ -18,21 +17,17 @@ export function ObservationEditorPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { success, error } = useToast();
-  const { theme, toggleTheme } = useTheme();
 
   const {
-    currentId,
     editor,
     isEditorLoading,
     isSaving,
-    editorError,
     isDirty,
     loadObservation,
     resetEditor,
     setInfo,
     setLayerRows,
     setTemperaturePoints,
-    setStabilityGroups,
     addStabilityGroup,
     removeStabilityGroup,
     updateStabilityGroup,
@@ -63,32 +58,6 @@ export function ObservationEditorPage() {
       // 组件卸载时清理
     };
   }, [id, loadObservation, resetEditor]);
-
-  // 生成测试摘要标签（如 "CT13Q1", "ECTP12"）
-  const formatTestLabel = (test: typeof editor.stabilityGroups[0]['tests'][0]) => {
-    switch (test.type) {
-      case 'CT':
-        // CT + 敲击次数 + 剪切质量 -> "CT13Q1"
-        return `CT${test.taps || ''}${test.quality || ''}`;
-      case 'ECT':
-        // ECT + 结果(去掉ECT前缀) + 敲击次数 -> "ECTP12"
-        const ectResult = test.result?.replace('ECT', '') || '';
-        return `ECT${ectResult}${test.taps || ''}`;
-      case 'PST':
-        // PST + 切入长度/柱长 + 传播 -> "PST20/100END"
-        const pstInfo = test.cut && test.length ? `${test.cut}/${test.length}` : '';
-        return `PST${pstInfo}${test.propagation || ''}`;
-      case 'RB':
-        // RB评分 + 剪切质量 -> "RB3Q2"
-        return `${test.score || 'RB'}${test.quality || ''}`;
-      case 'DTT':
-        return `DTT${test.result || ''}`;
-      case '槽口测试':
-        return `槽口${test.result || ''}`;
-      default:
-        return test.type;
-    }
-  };
 
   // 测试标记（用于在雪层剖面图上显示测试深度和完整摘要）
   const testMarkers = useMemo(() => {
@@ -182,13 +151,6 @@ export function ObservationEditorPage() {
           {isDirty && <span className="dirty-dot">●</span>}
         </div>
         <div className="toolbar-actions">
-          <button
-            className="toolbar-btn theme-toggle"
-            onClick={toggleTheme}
-            title={theme === 'dark' ? '切换亮色模式' : '切换深色模式'}
-          >
-            {theme === 'dark' ? '☀' : '☾'}
-          </button>
           {!showPreview && (
             <button
               className={`toolbar-btn toggle-sidebar ${sidebarOpen ? 'active' : ''}`}

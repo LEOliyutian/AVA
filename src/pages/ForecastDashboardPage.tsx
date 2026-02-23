@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useIsForecaster } from '../store/auth.store';
 import { forecastApi, type ForecastListItem } from '../api';
 import { DANGER_CONFIG } from '../config';
 import './ForecastDashboardPage.css';
@@ -30,6 +31,7 @@ function getDangerColor(level: number) {
 
 export function ForecastDashboardPage() {
   const navigate = useNavigate();
+  const isForecaster = useIsForecaster();
   const [forecasts, setForecasts] = useState<ForecastListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -104,7 +106,7 @@ export function ForecastDashboardPage() {
         <div className="dash-header-left">
           <Link to="/forecasts/list" className="dash-back-btn">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
             <span>预报记录</span>
           </Link>
@@ -114,6 +116,15 @@ export function ForecastDashboardPage() {
           </div>
         </div>
         <div className="dash-header-right">
+          {isForecaster && (
+            <button
+              className="range-btn active"
+              style={{ marginRight: '16px', backgroundColor: 'var(--primary)', color: 'white', border: 'none' }}
+              onClick={() => navigate('/editor')}
+            >
+              + 新建预报
+            </button>
+          )}
           <div className="dash-filter-group">
             <div className="dash-range-btns">
               {([7, 15, 30] as DaysRange[]).map(d => (
@@ -144,8 +155,8 @@ export function ForecastDashboardPage() {
         <div className="dash-empty">
           <div className="dash-empty-icon">
             <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-              <rect x="8" y="16" width="48" height="36" rx="4" stroke="currentColor" strokeWidth="2" strokeDasharray="4 4"/>
-              <path d="M16 40L24 32L32 36L40 24L48 28" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <rect x="8" y="16" width="48" height="36" rx="4" stroke="currentColor" strokeWidth="2" strokeDasharray="4 4" />
+              <path d="M16 40L24 32L32 36L40 24L48 28" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
           <p>暂无趋势数据</p>

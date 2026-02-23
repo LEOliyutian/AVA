@@ -16,7 +16,19 @@ import {
   WeatherListPage,
   WeatherEditorPage,
   WeatherDashboardPage,
+  SafetyHomePage,
+  ProblemTypesPage,
+  DangerScalePage,
+  TerrainGuidePage,
+  CrystalTypesPage,
+  RescuePage,
+  DecisionFrameworkPage,
+  AvalancheMapPage,
 } from './pages';
+
+function isFullscreenPath(pathname: string): boolean {
+  return pathname === '/map';
+}
 
 function isEditorPath(pathname: string): boolean {
   // Match /editor, /editor/:id, /observations/new, /observations/:id, /weather/new, /weather/:id
@@ -32,7 +44,7 @@ function isAuthPath(pathname: string): boolean {
 
 function AppRouterContent() {
   const location = useLocation();
-  const showHeader = !isEditorPath(location.pathname) && !isAuthPath(location.pathname);
+  const showHeader = !isEditorPath(location.pathname) && !isAuthPath(location.pathname) && !isFullscreenPath(location.pathname);
 
   return (
     <>
@@ -81,6 +93,18 @@ function AppRouterContent() {
         <Route path="/weather/dashboard" element={<Navigate to="/weather" replace />} />
         <Route path="/weather/new" element={<WeatherEditorPage />} />
         <Route path="/weather/:id" element={<WeatherEditorPage />} />
+
+        {/* 3D Avalanche Map - public */}
+        <Route path="/map" element={<AvalancheMapPage />} />
+
+        {/* Safety knowledge - public */}
+        <Route path="/safety" element={<SafetyHomePage />} />
+        <Route path="/safety/problem-types" element={<ProblemTypesPage />} />
+        <Route path="/safety/danger-scale" element={<DangerScalePage />} />
+        <Route path="/safety/terrain" element={<TerrainGuidePage />} />
+        <Route path="/safety/crystal-types" element={<CrystalTypesPage />} />
+        <Route path="/safety/rescue" element={<RescuePage />} />
+        <Route path="/safety/decision" element={<DecisionFrameworkPage />} />
 
         {/* 404 redirect */}
         <Route path="*" element={<Navigate to="/" replace />} />

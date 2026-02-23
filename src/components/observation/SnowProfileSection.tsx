@@ -2,7 +2,8 @@ import { useRef, useMemo, useCallback, useEffect, useState } from 'react';
 import type { LayerRow, TemperaturePoint } from '../../types/observation';
 import {
   HARDNESS_OPTIONS,
-  CRYSTAL_TYPE_OPTIONS,
+  CRYSTAL_TYPE_GROUPS,
+  CRYSTAL_TYPE_DESCRIPTIONS,
   WETNESS_OPTIONS,
   HARDNESS_COLORS,
   CRYSTAL_TYPE_COLORS,
@@ -86,7 +87,7 @@ export function SnowProfileSection({
   }, [layerRows, totalHS]);
 
   // 计算最低层底和剩余深度
-  const { minDepth, remainingDepth, isOverflow } = useMemo(() => {
+  const { remainingDepth, isOverflow } = useMemo(() => {
     const min = layersWithDepth.length > 0
       ? Math.min(...layersWithDepth.map(r => r.startDepth || 0))
       : (totalHS > 0 ? totalHS : 0);
@@ -755,75 +756,102 @@ export function SnowProfileSection({
                       </tr>
                     </thead>
                     <tbody>
-                      {layerRows.map((row) => {
-                        const calculated = layersWithDepth.find(l => l.id === row.id);
-                        const isDragging = draggedLayerId === row.id;
-                        const isDragOver = dragOverLayerId === row.id;
-                        return (
-                          <tr
-                            key={row.id}
-                            draggable
-                            onDragStart={(e) => handleDragStart(e, row.id)}
-                            onDragEnd={handleDragEnd}
-                            onDragOver={(e) => handleDragOver(e, row.id)}
-                            onDragLeave={handleDragLeave}
-                            onDrop={(e) => handleDrop(e, row.id)}
-                            className={`${isDragging ? 'dragging' : ''} ${isDragOver ? 'drag-over' : ''}`}
-                          >
-                            <td className="drag-handle">
-                              <span className="drag-icon">⋮⋮</span>
-                            </td>
-                            <td>
-                              <input
-                                type="number"
-                                value={row.topDepth}
-                                onChange={(e) => updateLayerField(row.id, 'topDepth', e.target.value)}
-                                onKeyDown={handleLayerKeyDown}
-                                className="table-input"
-                                placeholder="cm"
-                                min="0"
-                              />
-                            </td>
-                            <td className="depth-range">
-                              {calculated ? `${calculated.startDepth}→${calculated.endDepth}` : '--'}
-                            </td>
-                            <td>
-                              <select value={row.hardness} onChange={(e) => updateLayerField(row.id, 'hardness', e.target.value)} className="table-select">
-                                {HARDNESS_OPTIONS.map((opt) => (
-                                  <option key={opt} value={opt}>{opt}</option>
-                                ))}
-                              </select>
-                            </td>
-                            <td>
-                              <select value={row.type} onChange={(e) => updateLayerField(row.id, 'type', e.target.value)} className="table-select">
-                                {CRYSTAL_TYPE_OPTIONS.map((opt) => (
-                                  <option key={opt} value={opt}>{opt}</option>
-                                ))}
-                              </select>
-                            </td>
-                            <td>
-                              <input
-                                type="number"
-                                step="0.1"
-                                value={row.grainSize}
-                                onChange={(e) => updateLayerField(row.id, 'grainSize', e.target.value)}
-                                className="table-input"
-                                placeholder="mm"
-                              />
-                            </td>
-                            <td>
-                              <select value={row.wetness} onChange={(e) => updateLayerField(row.id, 'wetness', e.target.value)} className="table-select">
-                                {WETNESS_OPTIONS.map((opt) => (
-                                  <option key={opt} value={opt}>{opt}</option>
-                                ))}
-                              </select>
-                            </td>
-                            <td>
-                              <button className="remove-btn" onClick={() => removeLayer(row.id)}>×</button>
-                            </td>
-                          </tr>
-                        );
-                      })}
+                      {(() => {
+                        // 找出 topDepth 最大的行 id（雪面高度 HS 行，只显示深度）
+                        const maxTopDepthId = layerRows.reduce<number | null>((maxId, row) => {
+                          const depth = Number(row.topDepth);
+                          if (!Number.isFinite(depth)) return maxId;
+                          if (maxId === null) return row.id;
+                          const maxDepth = Number(layerRows.find(r => r.id === maxId)!.topDepth);
+                          return depth > maxDepth ? row.id : maxId;
+                        }, null);
+
+                        return layerRows.map((row) => {
+                          const calculated = layersWithDepth.find(l => l.id === row.id);
+                          const isDragging = draggedLayerId === row.id;
+                          const isDragOver = dragOverLayerId === row.id;
+                          const isHSRow = row.id === maxTopDepthId;
+                          return (
+                            <tr
+                              key={row.id}
+                              draggable
+                              onDragStart={(e) => handleDragStart(e, row.id)}
+                              onDragEnd={handleDragEnd}
+                              onDragOver={(e) => handleDragOver(e, row.id)}
+                              onDragLeave={handleDragLeave}
+                              onDrop={(e) => handleDrop(e, row.id)}
+                              className={`${isDragging ? 'dragging' : ''} ${isDragOver ? 'drag-over' : ''}`}
+                            >
+                              <td className="drag-handle">
+                                <span className="drag-icon">⋮⋮</span>
+                              </td>
+                              <td>
+                                <input
+                                  type="number"
+                                  value={row.topDepth}
+                                  onChange={(e) => updateLayerField(row.id, 'topDepth', e.target.value)}
+                                  onKeyDown={handleLayerKeyDown}
+                                  className="table-input"
+                                  placeholder="cm"
+                                  min="0"
+                                />
+                              </td>
+                              <td className="depth-range">
+                                {calculated ? `${calculated.startDepth}→${calculated.endDepth}` : '--'}
+                              </td>
+                              {isHSRow ? (
+                                <>
+                                  <td></td>
+                                  <td></td>
+                                  <td></td>
+                                  <td></td>
+                                </>
+                              ) : (
+                                <>
+                                  <td>
+                                    <select value={row.hardness} onChange={(e) => updateLayerField(row.id, 'hardness', e.target.value)} className="table-select">
+                                      {HARDNESS_OPTIONS.map((opt) => (
+                                        <option key={opt} value={opt}>{opt}</option>
+                                      ))}
+                                    </select>
+                                  </td>
+                                  <td>
+                                    <select value={row.type} onChange={(e) => updateLayerField(row.id, 'type', e.target.value)} className="table-select">
+                                      {CRYSTAL_TYPE_GROUPS.map((g) => (
+                                        <optgroup key={g.label} label={g.label}>
+                                          {g.types.map((opt) => (
+                                            <option key={opt} value={opt} title={CRYSTAL_TYPE_DESCRIPTIONS[opt]}>{opt}</option>
+                                          ))}
+                                        </optgroup>
+                                      ))}
+                                    </select>
+                                  </td>
+                                  <td>
+                                    <input
+                                      type="number"
+                                      step="0.1"
+                                      value={row.grainSize}
+                                      onChange={(e) => updateLayerField(row.id, 'grainSize', e.target.value)}
+                                      className="table-input"
+                                      placeholder="mm"
+                                    />
+                                  </td>
+                                  <td>
+                                    <select value={row.wetness} onChange={(e) => updateLayerField(row.id, 'wetness', e.target.value)} className="table-select">
+                                      {WETNESS_OPTIONS.map((opt) => (
+                                        <option key={opt} value={opt}>{opt}</option>
+                                      ))}
+                                    </select>
+                                  </td>
+                                </>
+                              )}
+                              <td>
+                                <button className="remove-btn" onClick={() => removeLayer(row.id)}>×</button>
+                              </td>
+                            </tr>
+                          );
+                        });
+                      })()}
                       {layerRows.length === 0 && (
                         <tr>
                           <td colSpan={8} className="empty-row">点击下方按钮添加雪层</td>

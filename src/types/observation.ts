@@ -101,7 +101,66 @@ export interface ObservationInfo {
 
 // 配置常量
 export const HARDNESS_OPTIONS = ['F', '4F', '1F', 'P', 'K', 'I'];
-export const CRYSTAL_TYPE_OPTIONS = ['PP', 'DF', 'RG', 'FC', 'DH', 'SH', 'MF', 'CR'];
+
+// ICSSG 晶体类型分组（含子类型）
+export const CRYSTAL_TYPE_GROUPS = [
+  { label: 'PP - 降水颗粒', types: ['PP', 'PPgp', 'PPco', 'PPnd', 'PPpl', 'PPsd', 'PPir', 'PPhl', 'PPip', 'PPrm'] },
+  { label: 'DF - 分解颗粒', types: ['DF', 'DFdc', 'DFbk'] },
+  { label: 'RG - 圆粒', types: ['RG', 'RGsr', 'RGlr', 'RGwp', 'RGxf'] },
+  { label: 'FC - 棱角晶', types: ['FC', 'FCso', 'FCsf', 'FCxr'] },
+  { label: 'DH - 深霜', types: ['DH', 'DHcp', 'DHpr', 'DHch', 'DHla', 'DHxr'] },
+  { label: 'SH - 表面霜', types: ['SH', 'SHsu', 'SHcv', 'SHxr'] },
+  { label: 'MF - 融冻', types: ['MF', 'MFcl', 'MFpc', 'MFsl', 'MFcr'] },
+  { label: 'CR - 冰壳', types: ['CR', 'CRrg', 'CRsn', 'CRwi'] },
+];
+
+export const CRYSTAL_TYPE_OPTIONS = CRYSTAL_TYPE_GROUPS.flatMap(g => g.types);
+
+// ICSSG 晶型英文定义（用于 tooltip）
+export const CRYSTAL_TYPE_DESCRIPTIONS: Record<string, string> = {
+  PP:   'Precipitation Particles',
+  PPgp: 'Graupel',
+  PPco: 'Columns',
+  PPnd: 'Needles',
+  PPpl: 'Plates',
+  PPsd: 'Stellar dendrites',
+  PPir: 'Irregular crystals',
+  PPhl: 'Hail',
+  PPip: 'Ice pellets',
+  PPrm: 'Rime',
+  DF:   'Decomposing and Fragmented particles',
+  DFdc: 'Partly decomposed particles',
+  DFbk: 'Wind-broken particles',
+  RG:   'Rounded Grains',
+  RGsr: 'Small rounded particles',
+  RGlr: 'Large rounded particles',
+  RGwp: 'Wind packed',
+  RGxf: 'Faceted rounded particles',
+  FC:   'Faceted Crystals',
+  FCso: 'Solid faceted particles',
+  FCsf: 'Near-surface faceted particles',
+  FCxr: 'Rounding faceted particles',
+  DH:   'Depth Hoar',
+  DHcp: 'Cup-shaped crystals',
+  DHpr: 'Prismatic crystals',
+  DHch: 'Chains of depth hoar',
+  DHla: 'Large striated crystals',
+  DHxr: 'Rounding depth hoar',
+  SH:   'Surface Hoar',
+  SHsu: 'Surface hoar crystals',
+  SHcv: 'Cavity or crevasse hoar',
+  SHxr: 'Rounding surface hoar',
+  MF:   'Melt Forms',
+  MFcl: 'Clustered rounded grains',
+  MFpc: 'Rounded polycrystals',
+  MFsl: 'Slush',
+  MFcr: 'Melt-freeze crust',
+  CR:   'Crusts',
+  CRrg: 'Rain crust',
+  CRsn: 'Sun crust',
+  CRwi: 'Wind crust',
+};
+
 export const WETNESS_OPTIONS = ['D', 'M', 'W', 'V', 'S'];
 export const TEST_TYPE_OPTIONS: TestType[] = ['CT', 'ECT', 'PST', 'DTT', 'RB', '槽口测试'];
 export const SHEAR_QUALITY_OPTIONS = ['Q1', 'Q2', 'Q3'];
@@ -118,8 +177,8 @@ export const HARDNESS_COLORS: Record<string, string> = {
   I: '#93c5fd',
 };
 
-// 晶型颜色映射
-export const CRYSTAL_TYPE_COLORS: Record<string, string> = {
+// 晶型颜色映射（子类型继承父类型颜色）
+const CRYSTAL_BASE_COLORS: Record<string, string> = {
   PP: '#a5f3fc',
   DF: '#bae6fd',
   RG: '#c7d2fe',
@@ -129,6 +188,12 @@ export const CRYSTAL_TYPE_COLORS: Record<string, string> = {
   MF: '#d9f99d',
   CR: '#e5e7eb',
 };
+export const CRYSTAL_TYPE_COLORS: Record<string, string> = Object.fromEntries(
+  CRYSTAL_TYPE_GROUPS.flatMap(g => {
+    const baseColor = CRYSTAL_BASE_COLORS[g.types[0]] || '#e5e7eb';
+    return g.types.map(t => [t, baseColor]);
+  })
+);
 
 // 硬度顺序和宽度映射
 export const HARDNESS_ORDER = ['F', '4F', '1F', 'P', 'K', 'I'];

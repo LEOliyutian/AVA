@@ -24,6 +24,7 @@ function getTodayDate(): string {
 
 // 默认站点观测数据
 const defaultUpperStation: StationObservation = {
+  name: 'Upper Station',
   elevation: 2600,
   time: '10:36',
   cloudCover: 'FEW',
@@ -40,6 +41,7 @@ const defaultUpperStation: StationObservation = {
 };
 
 const defaultLowerStation: StationObservation = {
+  name: 'Lower Station',
   elevation: 1850,
   time: '10:14',
   cloudCover: 'FEW',
@@ -122,6 +124,7 @@ interface ForecastActions {
   setPrimaryLikelihood: (likelihood: LikelihoodLevel) => void;
   setPrimarySize: (size: SizeLevel) => void;
   togglePrimarySector: (sector: RoseSectorKey) => void;
+  setPrimarySectors: (sectors: Set<RoseSectorKey>) => void;
   setPrimaryDescription: (description: string) => void;
 
   // 次要问题
@@ -130,6 +133,7 @@ interface ForecastActions {
   setSecondaryLikelihood: (likelihood: LikelihoodLevel) => void;
   setSecondarySize: (size: SizeLevel) => void;
   toggleSecondarySector: (sector: RoseSectorKey) => void;
+  setSecondarySectors: (sectors: Set<RoseSectorKey>) => void;
   setSecondaryDescription: (description: string) => void;
 
   // 天气预报摘要
@@ -149,6 +153,9 @@ interface ForecastActions {
 
   // 摘要
   setSummary: (text: string) => void;
+
+  // 标记为干净状态（加载数据后）
+  markClean: () => void;
 
   // 重置
   reset: () => void;
@@ -236,6 +243,12 @@ export const useForecastStore = create<ForecastStore>()(
             }
           })
         ),
+      setPrimarySectors: (sectors) =>
+        set(
+          produce((state: ForecastState) => {
+            state.primaryProblem.sectors = sectors;
+          })
+        ),
       setPrimaryDescription: (description) =>
         set(
           produce((state: ForecastState) => {
@@ -271,6 +284,12 @@ export const useForecastStore = create<ForecastStore>()(
             } else {
               state.secondaryProblem.sectors.add(sector);
             }
+          })
+        ),
+      setSecondarySectors: (sectors) =>
+        set(
+          produce((state: ForecastState) => {
+            state.secondaryProblem.sectors = sectors;
           })
         ),
       setSecondaryDescription: (description) =>
@@ -342,6 +361,9 @@ export const useForecastStore = create<ForecastStore>()(
 
       // 摘要
       setSummary: (summary) => set({ summary }),
+
+      // 标记为干净状态（加载完成后调用，当前无脏状态追踪，预留接口）
+      markClean: () => {},
 
       // 重置
       reset: () => set(initialState),

@@ -538,7 +538,7 @@ function TemperatureChart({ data }: { data: DatePoint[] }) {
 
   // Min/Max band fill
   const bandPath = data.map((d, i) => `${i === 0 ? 'M' : 'L'}${x(i).toFixed(1)},${y(d.temp_max).toFixed(1)}`).join(' ')
-    + data.map((d, i) => `L${x(data.length - 1 - i).toFixed(1)},${y(data[data.length - 1 - i].temp_min).toFixed(1)}`).join(' ')
+    + data.map((_d, i) => `L${x(data.length - 1 - i).toFixed(1)},${y(data[data.length - 1 - i].temp_min).toFixed(1)}`).join(' ')
     + 'Z';
 
   // Ticks

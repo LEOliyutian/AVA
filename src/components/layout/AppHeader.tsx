@@ -1,10 +1,9 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuthStore, useIsForecaster } from '../../store/auth.store';
+import { useAuthStore } from '../../store/auth.store';
 import './AppHeader.css';
 
 export function AppHeader() {
   const { user, logout } = useAuthStore();
-  const isForecaster = useIsForecaster();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -40,10 +39,11 @@ export function AppHeader() {
           </Link>
 
           <nav className="main-nav">
-            <Link to="/" className={`nav-item${isActive('/') ? ' active' : ''}`}>首页</Link>
             <Link to="/forecasts" className={`nav-item${isActive('/forecasts') ? ' active' : ''}`}>雪崩预报</Link>
             <Link to="/weather" className={`nav-item${isActive('/weather') ? ' active' : ''}`}>气象观察</Link>
             <Link to="/observations" className={`nav-item${isActive('/observations') ? ' active' : ''}`}>雪层观测</Link>
+            <Link to="/map" className={`nav-item${isActive('/map') ? ' active' : ''}`}>雪崩地图</Link>
+            <Link to="/safety" className={`nav-item${isActive('/safety') ? ' active' : ''}`}>安全知识</Link>
           </nav>
         </div>
 

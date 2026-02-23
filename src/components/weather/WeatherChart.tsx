@@ -21,11 +21,11 @@ const cloudIcons: Record<string, string> = {
 // 降水图标
 const precipIcons: Record<string, string> = {
   '无': '',
-  '小雪': '🌨',
-  '中雪': '❄️',
-  '大雪': '🌨❄️',
+  '小雪': '❄',
+  '中雪': '❄❄',
+  '大雪': '❄❄❄',
   '雨': '🌧',
-  '雨夹雪': '🌨🌧',
+  '雨夹雪': '🌧❄',
   '冻雨': '🧊',
 };
 
@@ -81,7 +81,7 @@ export function WeatherChart({ stations, tempMin, tempMax }: WeatherChartProps) 
   const marginLeft = 60;
   const marginRight = 60;
   const marginTop = 40;
-  const marginBottom = 80;
+  const marginBottom = 95;
   const innerWidth = chartWidth - marginLeft - marginRight;
   const innerHeight = chartHeight - marginTop - marginBottom;
 
@@ -420,6 +420,18 @@ export function WeatherChart({ stations, tempMin, tempMax }: WeatherChartProps) 
                   {cloudIcons[s.cloudCover] || ''}
                   {precipIcons[s.precipitation] || ''}
                 </text>
+                {/* 降水文字标注 */}
+                {s.precipitation && s.precipitation !== '无' && (
+                  <text
+                    x={x}
+                    y={marginTop + innerHeight + 66}
+                    textAnchor="middle"
+                    className="precip-label"
+                    fontSize="10"
+                  >
+                    {s.precipitation}
+                  </text>
+                )}
               </g>
             );
           })}

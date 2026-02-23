@@ -1,6 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { config } from './config/index.js';
 
 import authRoutes from './routes/auth.routes.js';
@@ -8,6 +10,10 @@ import forecastRoutes from './routes/forecast.routes.js';
 import userRoutes from './routes/user.routes.js';
 import observationRoutes from './routes/observation.routes.js';
 import weatherRoutes from './routes/weather.routes.js';
+import avalancheEventRoutes from './routes/avalanche-event.routes.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
@@ -25,6 +31,10 @@ app.use('/api/forecasts', forecastRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/observations', observationRoutes);
 app.use('/api/weather-observations', weatherRoutes);
+app.use('/api/avalanche-events', avalancheEventRoutes);
+
+// 静态文件服务：上传的照片
+app.use('/uploads', express.static(path.resolve(__dirname, '../data/uploads')));
 
 // 健康检查
 app.get('/api/health', (_req, res) => {

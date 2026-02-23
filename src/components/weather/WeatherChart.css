@@ -49,6 +49,11 @@
   font-size: 16px;
 }
 
+.precip-label {
+  font-size: 9px;
+  fill: var(--text-tertiary, #9ca3af);
+}
+
 /* 网格线 */
 .grid-lines line {
   stroke: var(--grid-color, rgba(255, 255, 255, 0.1));

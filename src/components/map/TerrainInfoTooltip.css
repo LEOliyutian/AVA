@@ -1,0 +1,98 @@
+/* === 地形查询浮窗 === */
+.terrain-info-tooltip {
+  position: fixed;
+  z-index: 20;
+  width: 220px;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(12px);
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  pointer-events: auto;
+  animation: terrain-tooltip-in 0.15s ease-out;
+}
+
+@keyframes terrain-tooltip-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.terrain-info-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.terrain-info-close {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0 2px;
+  line-height: 1;
+  opacity: 0.8;
+}
+
+.terrain-info-close:hover {
+  opacity: 1;
+}
+
+.terrain-info-body {
+  padding: 8px 12px 10px;
+}
+
+.terrain-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 4px 0;
+  font-size: 12px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.terrain-info-row:last-child {
+  border-bottom: none;
+}
+
+.terrain-info-label {
+  color: var(--text-muted);
+  font-weight: 600;
+  flex-shrink: 0;
+  margin-right: 8px;
+}
+
+.terrain-info-value {
+  color: var(--text-primary);
+  text-align: right;
+  word-break: break-all;
+}
+
+.terrain-slope-value {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.terrain-danger-badge {
+  display: inline-block;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: #ff3c3c;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}

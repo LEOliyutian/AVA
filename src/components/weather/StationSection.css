@@ -173,3 +173,12 @@
   text-transform: uppercase;
   letter-spacing: 1px;
 }
+
+/* Field hint (wind scale etc.) */
+.station-field .field-hint {
+  display: block;
+  font-size: 10px;
+  color: var(--primary);
+  margin-top: 3px;
+  font-weight: 500;
+}

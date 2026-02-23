@@ -13,6 +13,7 @@ const DB_PATH = path.resolve(DATA_DIR, 'avalanche.db');
 const SCHEMA_PATH = path.resolve(__dirname, 'schema.sql');
 const OBSERVATIONS_SCHEMA_PATH = path.resolve(__dirname, 'observations-schema.sql');
 const WEATHER_SCHEMA_PATH = path.resolve(__dirname, 'weather-schema.sql');
+const AVALANCHE_EVENTS_SCHEMA_PATH = path.resolve(__dirname, 'avalanche-events-schema.sql');
 
 async function initDatabase() {
   console.log('初始化数据库...');
@@ -42,6 +43,23 @@ async function initDatabase() {
   console.log('执行气象观测数据库 schema...');
   const weatherSchema = fs.readFileSync(WEATHER_SCHEMA_PATH, 'utf-8');
   db.exec(weatherSchema);
+
+  // 执行雪崩事件 schema
+  console.log('执行雪崩事件数据库 schema...');
+  const avalancheEventsSchema = fs.readFileSync(AVALANCHE_EVENTS_SCHEMA_PATH, 'utf-8');
+  db.exec(avalancheEventsSchema);
+
+  // 迁移：为 weather_station_data 添加新字段
+  const weatherColumns = db.prepare("PRAGMA table_info(weather_station_data)").all() as { name: string }[];
+  const columnNames = weatherColumns.map(c => c.name);
+  if (!columnNames.includes('hin')) {
+    db.exec('ALTER TABLE weather_station_data ADD COLUMN hin REAL');
+    console.log('迁移: 添加 weather_station_data.hin 字段');
+  }
+  if (!columnNames.includes('foot_penetration')) {
+    db.exec('ALTER TABLE weather_station_data ADD COLUMN foot_penetration REAL');
+    console.log('迁移: 添加 weather_station_data.foot_penetration 字段');
+  }
 
   // 检查是否已有管理员用户
   const existingAdmin = db.prepare('SELECT id FROM users WHERE username = ?').get('admin');

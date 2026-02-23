@@ -3,4 +3,5 @@ export { useAuthStore, useIsAdmin, useIsForecaster, useCanEdit } from './auth.st
 export { useObservationStore } from './observation.store';
 export { useWeatherStore } from './weather.store';
 export { useToastStore } from './toast.store';
+export { useMapStore } from './map.store';
 export * from './selectors';

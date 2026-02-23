@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { forecastApi, type ForecastListItem, type PaginatedResponse } from '../api';
+import { forecastApi, type ForecastListItem } from '../api';
 import { useIsForecaster } from '../store/auth.store';
 import { DANGER_CONFIG } from '../config';
 import './ForecastListPage.css';

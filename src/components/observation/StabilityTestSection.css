@@ -149,7 +149,7 @@
 }
 
 .test-label {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--text-primary);
 }
@@ -197,6 +197,7 @@
   background: var(--bg-input);
   color: var(--text-primary);
   border-radius: 4px;
+  padding: 0 8px;
 }
 
 .add-group-btn {

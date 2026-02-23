@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { forecastApi, type ForecastDetail } from '../api';
-import { useAuthStore, useCanEdit, useIsAdmin } from '../store/auth.store';
+import { useCanEdit, useIsAdmin } from '../store/auth.store';
 import { DANGER_CONFIG, TREND_CONFIG } from '../config';
 import { RoseDiagram } from '../components/shared';
 import { ConfirmDialog } from '../components/ui';
@@ -19,7 +19,6 @@ export function ForecastDetailPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const reportRef = useRef<HTMLDivElement>(null);
-  const { user } = useAuthStore();
   const canEdit = useCanEdit(forecast?.forecaster_id);
   const isAdmin = useIsAdmin();
   const navigate = useNavigate();

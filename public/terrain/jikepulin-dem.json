@@ -1,0 +1,19 @@
+{
+  "width": 1082,
+  "height": 1081,
+  "west": 87.37694444444445,
+  "east": 87.6775,
+  "south": 48.43472222222222,
+  "north": 48.735,
+  "pixelWidth": 0.0002777777777777778,
+  "pixelHeight": 0.0002777777777777778,
+  "minElevation": 1038.4945068359375,
+  "maxElevation": 3189.33251953125,
+  "avgElevation": 1921,
+  "nodata": 1921.1051181076868,
+  "source": "Copernicus GLO-30 (30m)",
+  "center": {
+    "lat": 48.585,
+    "lng": 87.527
+  }
+}

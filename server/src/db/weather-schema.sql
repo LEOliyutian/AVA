@@ -31,6 +31,8 @@ CREATE TABLE IF NOT EXISTS weather_station_data (
   snow_depth REAL,
   hst REAL,
   h24 REAL,
+  hin REAL,
+  foot_penetration REAL,
   sort_order INTEGER DEFAULT 0,
   FOREIGN KEY (observation_id) REFERENCES weather_observation_records(id) ON DELETE CASCADE
 );

@@ -3,6 +3,8 @@ export { authApi } from './auth.api';
 export { forecastApi } from './forecast.api';
 export { observationApi } from './observation.api';
 export { weatherApi } from './weather.api';
+export { avalancheEventApi } from './avalanche-event.api';
+export type { AvalancheEventListParams } from './avalanche-event.api';
 export type { SafeUser, AuthResponse, LoginRequest, RegisterRequest } from './auth.api';
 export type {
   ForecastListItem,

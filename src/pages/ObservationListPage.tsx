@@ -4,7 +4,7 @@ import { useObservationStore } from '../store';
 import { useToast } from '../hooks';
 import { ConfirmDialog } from '../components/ui';
 import { observationApi, type ObservationDetail } from '../api/observation.api';
-import { exportToPng } from '../utils';
+import { exportToPng, formatTestLabel } from '../utils';
 import { SnowProfileSection } from '../components/observation';
 import './ObservationListPage.css';
 
@@ -116,28 +116,6 @@ export function ObservationListPage() {
       success(`成功删除 ${successCount} 条记录`);
     } else {
       showError(`删除完成，成功 ${successCount} 条，失败 ${ids.length - successCount} 条`);
-    }
-  };
-
-  // 生成测试摘要标签
-  const formatTestLabel = (test: { type: string; taps?: string; result?: string; quality?: string; cut?: string; length?: string; propagation?: string; score?: string }) => {
-    switch (test.type) {
-      case 'CT':
-        return `CT${test.taps || ''}${test.quality || ''}`;
-      case 'ECT':
-        const ectResult = test.result?.replace('ECT', '') || '';
-        return `ECT${ectResult}${test.taps || ''}`;
-      case 'PST':
-        const pstInfo = test.cut && test.length ? `${test.cut}/${test.length}` : '';
-        return `PST${pstInfo}${test.propagation || ''}`;
-      case 'RB':
-        return `${test.score || 'RB'}${test.quality || ''}`;
-      case 'DTT':
-        return `DTT${test.result || ''}`;
-      case '槽口测试':
-        return `槽口${test.result || ''}`;
-      default:
-        return test.type;
     }
   };
 

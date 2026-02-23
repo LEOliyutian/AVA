@@ -40,6 +40,8 @@ export interface StationEditorState {
   snowDepth: number | '';
   hst: number | '';
   h24: number | '';
+  hin: number | '';
+  footPenetration: number | '';
 }
 
 // 气象观测编辑器状态
@@ -88,6 +90,8 @@ function createDefaultStation(id: number): StationEditorState {
     snowDepth: '',
     hst: '',
     h24: '',
+    hin: '',
+    footPenetration: '',
   };
 }
 
@@ -159,6 +163,8 @@ function apiToEditorState(data: WeatherObservationDetail): WeatherEditorState {
       snowDepth: s.snow_depth ?? '',
       hst: s.hst ?? '',
       h24: s.h24 ?? '',
+      hin: s.hin ?? '',
+      footPenetration: s.foot_penetration ?? '',
     })),
   };
 }
@@ -187,6 +193,8 @@ function editorStateToApi(state: WeatherEditorState): SaveWeatherObservationRequ
       snow_depth: s.snowDepth === '' ? 0 : s.snowDepth,
       hst: s.hst === '' ? undefined : s.hst,
       h24: s.h24 === '' ? undefined : s.h24,
+      hin: s.hin === '' ? undefined : s.hin,
+      foot_penetration: s.footPenetration === '' ? undefined : s.footPenetration,
     })),
   };
 }

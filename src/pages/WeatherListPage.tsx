@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useWeatherStore } from '../store';
 import { useToast } from '../hooks';
 import { ConfirmDialog } from '../components/ui';
@@ -57,9 +57,6 @@ export function WeatherListPage() {
       {/* 顶部导航 */}
       <div className="list-header-redesigned">
         <div className="header-brand-area">
-          <Link to="/" className="back-link-simple">
-            ← 首页
-          </Link>
           <h1 className="page-title">气象观测记录</h1>
         </div>
         <div className="header-actions-area">
