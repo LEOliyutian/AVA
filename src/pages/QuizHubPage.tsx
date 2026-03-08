@@ -243,8 +243,7 @@ export function QuizHubPage() {
                   percent={percent}
                   mastered={stats.mastered}
                   total={cat.totalQuestions}
-                  to="#"
-                  // onClick handled by wrapping
+                  to={cat.relatedPage}
                 />
               );
             })}

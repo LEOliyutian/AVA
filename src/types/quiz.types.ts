@@ -37,6 +37,7 @@ export interface QuizSession {
   answers: Record<string, string | string[]>;
   score: number;
   totalQuestions: number;
+  correctCount: number;
 }
 
 export interface CategoryStats {
@@ -59,6 +60,7 @@ export interface QuestionHistory {
 export interface UserQuizProgress {
   totalAnswered: number;
   totalCorrect: number;
+  scenarioCorrect: number;
   categoryStats: Record<CategoryId, CategoryStats>;
   questionHistory: Record<string, QuestionHistory>;
   sessions: QuizSession[];

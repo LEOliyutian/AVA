@@ -62,7 +62,7 @@ export const QUIZ_CATEGORIES: CategoryMeta[] = [
     icon: 'cloud-sun',
     description: '天气对雪崩风险的影响及气象数据解读',
     totalQuestions: 50,
-    relatedPage: '/safety/terrain',
+    relatedPage: '/weather',
   },
   {
     id: 'snow-profile',
@@ -71,7 +71,7 @@ export const QUIZ_CATEGORIES: CategoryMeta[] = [
     icon: 'layers',
     description: '雪坑观测方法和雪层结构分析',
     totalQuestions: 50,
-    relatedPage: '/safety/crystal-types',
+    relatedPage: '/observations',
   },
 ];
 

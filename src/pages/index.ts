@@ -18,3 +18,6 @@ export { CrystalTypesPage } from './CrystalTypesPage';
 export { RescuePage } from './RescuePage';
 export { DecisionFrameworkPage } from './DecisionFrameworkPage';
 export { AvalancheMapPage } from './AvalancheMapPage';
+export { QuizHubPage } from './QuizHubPage';
+export { QuizSessionPage } from './QuizSessionPage';
+export { QuizResultPage } from './QuizResultPage';

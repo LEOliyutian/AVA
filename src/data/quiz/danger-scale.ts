@@ -1,4 +1,4 @@
-import { QuizQuestion } from '../../types/quiz';
+import type { QuizQuestion } from '../../types/quiz.types';
 
 const questions: QuizQuestion[] = [
   // EASY QUESTIONS (25 total: ds-001 to ds-025)

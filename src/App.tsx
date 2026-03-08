@@ -24,6 +24,9 @@ import {
   RescuePage,
   DecisionFrameworkPage,
   AvalancheMapPage,
+  QuizHubPage,
+  QuizSessionPage,
+  QuizResultPage,
 } from './pages';
 
 function isFullscreenPath(pathname: string): boolean {
@@ -35,6 +38,8 @@ function isEditorPath(pathname: string): boolean {
   if (pathname === '/editor' || pathname.startsWith('/editor/')) return true;
   if (pathname === '/observations/new' || /^\/observations\/\d+$/.test(pathname)) return true;
   if (pathname === '/weather/new' || /^\/weather\/\d+$/.test(pathname)) return true;
+  // Quiz session and result pages are fullscreen (no header)
+  if (pathname === '/safety/quiz/session' || pathname === '/safety/quiz/result') return true;
   return false;
 }
 
@@ -105,6 +110,11 @@ function AppRouterContent() {
         <Route path="/safety/crystal-types" element={<CrystalTypesPage />} />
         <Route path="/safety/rescue" element={<RescuePage />} />
         <Route path="/safety/decision" element={<DecisionFrameworkPage />} />
+
+        {/* Quiz - public */}
+        <Route path="/safety/quiz" element={<QuizHubPage />} />
+        <Route path="/safety/quiz/session" element={<QuizSessionPage />} />
+        <Route path="/safety/quiz/result" element={<QuizResultPage />} />
 
         {/* 404 redirect */}
         <Route path="*" element={<Navigate to="/" replace />} />

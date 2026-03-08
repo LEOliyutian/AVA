@@ -42,13 +42,13 @@ export function QuizSessionPage() {
     }
 
     const correct = session.answerQuestion(question.id, optionId);
-    recordAnswer(question.id, question.category, correct);
+    recordAnswer(question.id, question.category, correct, question.type);
   }, [question, answered, isImmediate, session, recordAnswer]);
 
   const handleSubmitMultiple = useCallback(() => {
     if (!question || selectedMultiple.length === 0) return;
     const correct = session.answerQuestion(question.id, selectedMultiple);
-    recordAnswer(question.id, question.category, correct);
+    recordAnswer(question.id, question.category, correct, question.type);
     setSelectedMultiple([]);
   }, [question, selectedMultiple, session, recordAnswer]);
 
@@ -75,6 +75,7 @@ export function QuizSessionPage() {
       questionIds: session.questions.map((q) => q.id),
       answers: session.answers,
       score,
+      correctCount,
       totalQuestions: session.questions.length,
     });
 
@@ -89,7 +90,7 @@ export function QuizSessionPage() {
     // Record unanswered questions
     for (const q of session.questions) {
       if (!session.answers[q.id]) {
-        recordAnswer(q.id, q.category, false);
+        recordAnswer(q.id, q.category, false, q.type);
       }
     }
     handleComplete();

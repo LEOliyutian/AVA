@@ -134,16 +134,28 @@ export const useAuthStore = create<AuthStore>()(
         isAuthenticated: state.isAuthenticated,
       }),
       onRehydrateStorage: () => {
-        return (state) => {
+        return (state, error) => {
+          if (error) {
+            // hydrate 出错，直接结束 loading
+            console.error('Auth storage hydration error:', error);
+            useAuthStore.setState({ isLoading: false, _hasHydrated: true });
+            return;
+          }
           if (state) {
             state._hasHydrated = true;
-            // hydrate 完成后，如果之前有认证状态，验证 token
             if (state.isAuthenticated) {
-              state.checkAuth();
+              // 5秒超时兜底，防止网络问题导致永久加载
+              const timeout = setTimeout(() => {
+                useAuthStore.setState({ isLoading: false });
+              }, 5000);
+              state.checkAuth().finally(() => clearTimeout(timeout));
             } else {
               // 没有认证状态，直接结束 loading
               useAuthStore.setState({ isLoading: false });
             }
+          } else {
+            // 首次访问，localStorage 无存储数据
+            useAuthStore.setState({ isLoading: false, _hasHydrated: true });
           }
         };
       },

@@ -29,6 +29,7 @@ function defaultProgress(): UserQuizProgress {
   return {
     totalAnswered: 0,
     totalCorrect: 0,
+    scenarioCorrect: 0,
     categoryStats: defaultCategoryStats(),
     questionHistory: {},
     sessions: [],
@@ -39,7 +40,7 @@ function defaultProgress(): UserQuizProgress {
 }
 
 interface QuizStoreActions {
-  recordAnswer: (questionId: string, category: CategoryId, correct: boolean) => void;
+  recordAnswer: (questionId: string, category: CategoryId, correct: boolean, questionType?: string) => void;
   saveSession: (session: QuizSession) => void;
   saveDailyScore: (score: number) => void;
   resetProgress: () => void;
@@ -54,7 +55,7 @@ export const useQuizStore = create<QuizStore>()(
     (set, get) => ({
       ...defaultProgress(),
 
-      recordAnswer: (questionId, category, correct) => {
+      recordAnswer: (questionId, category, correct, questionType?) => {
         set((state) => {
           const now = Date.now();
           // Update question history
@@ -83,12 +84,14 @@ export const useQuizStore = create<QuizStore>()(
           // Update totals
           const totalAnswered = state.totalAnswered + 1;
           const totalCorrect = state.totalCorrect + (correct ? 1 : 0);
+          const scenarioCorrect = state.scenarioCorrect + (questionType === 'scenario' && correct ? 1 : 0);
 
           // Check achievements
           const newState: UserQuizProgress = {
             ...state,
             totalAnswered,
             totalCorrect,
+            scenarioCorrect,
             categoryStats,
             questionHistory,
             streak,
@@ -97,9 +100,9 @@ export const useQuizStore = create<QuizStore>()(
             dailyChallengeHistory: state.dailyChallengeHistory,
           };
           const newAch = checkNewAchievements(newState);
-          const achievements = [...state.achievements, ...newAch];
+          const achievements = [...new Set([...state.achievements, ...newAch])];
 
-          return { totalAnswered, totalCorrect, categoryStats, questionHistory, streak, achievements };
+          return { totalAnswered, totalCorrect, scenarioCorrect, categoryStats, questionHistory, streak, achievements };
         });
       },
 
@@ -129,8 +132,7 @@ export const useQuizStore = create<QuizStore>()(
       },
 
       getScenarioCorrectCount: () => {
-        // This would need question type info, tracked separately
-        return 0;
+        return get().scenarioCorrect;
       },
     }),
     {
@@ -138,6 +140,7 @@ export const useQuizStore = create<QuizStore>()(
       partialize: (state) => ({
         totalAnswered: state.totalAnswered,
         totalCorrect: state.totalCorrect,
+        scenarioCorrect: state.scenarioCorrect,
         categoryStats: state.categoryStats,
         questionHistory: state.questionHistory,
         sessions: state.sessions,

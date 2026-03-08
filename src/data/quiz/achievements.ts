@@ -105,11 +105,11 @@ export const ACHIEVEMENTS: AchievementDef[] = [
     ),
   },
   {
-    id: 'exam-master', name: '考试达人', description: '模拟考试得分率 ≥ 90%',
+    id: 'exam-master', name: '考试达人', description: '模拟考试正确率 ≥ 90%',
     category: '表现', icon: '🏆',
     check: (p) => p.sessions.some(
       (s) => s.mode === 'exam' && s.completedAt != null && s.totalQuestions > 0 &&
-        (s.score / (s.totalQuestions * 10)) >= 0.9
+        (s.correctCount / s.totalQuestions) >= 0.9
     ),
   },
   {
@@ -117,16 +117,16 @@ export const ACHIEVEMENTS: AchievementDef[] = [
     category: '表现', icon: '🌟',
     check: (p) => ALL_CATEGORIES.every((cat) => {
       const s = p.categoryStats[cat];
-      return s && s.answered >= 10 && (s.correct / s.answered) >= 0.8;
+      return s && s.answered >= 5 && (s.correct / s.answered) >= 0.8;
     }),
   },
   {
-    id: 'speed-demon', name: '速答王', description: '50 题考试 30 分钟内完成且 ≥ 80%',
+    id: 'speed-demon', name: '速答王', description: '50 题考试 30 分钟内完成且正确率 ≥ 80%',
     category: '表现', icon: '⚡',
     check: (p) => p.sessions.some(
       (s) => s.mode === 'exam' && s.totalQuestions >= 50 && s.completedAt != null &&
         (s.completedAt - s.startedAt) <= 30 * 60 * 1000 &&
-        (s.score / (s.totalQuestions * 10)) >= 0.8
+        (s.correctCount / s.totalQuestions) >= 0.8
     ),
   },
 
@@ -157,7 +157,7 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   {
     id: 'scenario-expert', name: '场景专家', description: '答对 30 道情景题',
     category: '特殊', icon: '🎭',
-    check: () => false, // Checked dynamically with question type info
+    check: (p) => (p.scenarioCorrect ?? 0) >= 30,
   },
 ];
 
