@@ -11,6 +11,7 @@ import userRoutes from './routes/user.routes.js';
 import observationRoutes from './routes/observation.routes.js';
 import weatherRoutes from './routes/weather.routes.js';
 import avalancheEventRoutes from './routes/avalanche-event.routes.js';
+import adminRoutes from './routes/admin.routes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -32,6 +33,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/observations', observationRoutes);
 app.use('/api/weather-observations', weatherRoutes);
 app.use('/api/avalanche-events', avalancheEventRoutes);
+app.use('/api/admin', adminRoutes);
 
 // 静态文件服务：上传的照片
 app.use('/uploads', express.static(path.resolve(__dirname, '../data/uploads')));

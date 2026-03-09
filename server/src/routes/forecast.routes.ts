@@ -2,6 +2,7 @@ import { Router, type Request, type Response } from 'express';
 import { forecastService } from '../services/forecast.service.js';
 import { authenticate, optionalAuth } from '../middleware/auth.middleware.js';
 import { requireForecaster, requireAdmin } from '../middleware/role.middleware.js';
+import { auditService } from '../services/audit.service.js';
 import type { CreateForecastRequest, PaginationParams, ForecastStatus } from '../types/index.js';
 
 const router = Router();
@@ -131,6 +132,16 @@ router.post('/', authenticate, requireForecaster, (req: Request, res: Response) 
 
     const forecastId = forecastService.createForecast(data, req.user!.userId);
 
+    auditService.write({
+      userId: req.user!.userId,
+      userName: req.user!.username,
+      action: 'forecast.create',
+      targetType: 'forecast',
+      targetId: forecastId,
+      detail: { forecast_date: data.forecast_date },
+      ipAddress: req.ip,
+    });
+
     res.status(201).json({
       success: true,
       data: { id: forecastId },
@@ -213,6 +224,15 @@ router.delete('/:id', authenticate, requireAdmin, (req: Request, res: Response) 
       return;
     }
 
+    auditService.write({
+      userId: req.user!.userId,
+      userName: req.user!.username,
+      action: 'forecast.delete',
+      targetType: 'forecast',
+      targetId: id,
+      ipAddress: req.ip,
+    });
+
     res.json({
       success: true,
       data: { message: '删除成功' },
@@ -258,6 +278,15 @@ router.post('/:id/publish', authenticate, requireForecaster, (req: Request, res:
     }
 
     forecastService.publishForecast(id);
+
+    auditService.write({
+      userId: req.user!.userId,
+      userName: req.user!.username,
+      action: 'forecast.publish',
+      targetType: 'forecast',
+      targetId: id,
+      ipAddress: req.ip,
+    });
 
     res.json({
       success: true,

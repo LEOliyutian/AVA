@@ -2,6 +2,7 @@ import { Router, type Request, type Response } from 'express';
 import { userService } from '../services/user.service.js';
 import { authenticate } from '../middleware/auth.middleware.js';
 import { requireAdmin } from '../middleware/role.middleware.js';
+import { auditService } from '../services/audit.service.js';
 import type { UserRole } from '../types/index.js';
 
 const router = Router();
@@ -65,11 +66,22 @@ router.put('/:id/role', authenticate, requireAdmin, (req: Request, res: Response
       return;
     }
 
+    const targetUser = userService.getUserById(id);
     const updated = userService.updateUserRole(id, role);
     if (!updated) {
       res.status(404).json({ success: false, error: '用户不存在' });
       return;
     }
+
+    auditService.write({
+      userId: req.user!.userId,
+      userName: req.user!.username,
+      action: 'user.role_change',
+      targetType: 'user',
+      targetId: id,
+      detail: { from: targetUser?.role, to: role, target_name: targetUser?.display_name },
+      ipAddress: req.ip,
+    });
 
     res.json({ success: true, data: { message: '角色更新成功' } });
   } catch (error) {
@@ -155,6 +167,16 @@ router.post('/:id/reset-password', authenticate, requireAdmin, async (req: Reque
     }
 
     await userService.resetPassword(id, new_password);
+
+    auditService.write({
+      userId: req.user!.userId,
+      userName: req.user!.username,
+      action: 'user.password_reset',
+      targetType: 'user',
+      targetId: id,
+      ipAddress: req.ip,
+    });
+
     res.json({ success: true, data: { message: '密码重置成功' } });
   } catch (error) {
     res.status(500).json({
@@ -173,7 +195,19 @@ router.delete('/:id', authenticate, requireAdmin, (req: Request, res: Response) 
       return;
     }
 
+    const targetUser = userService.getUserById(id);
     userService.deleteUser(id);
+
+    auditService.write({
+      userId: req.user!.userId,
+      userName: req.user!.username,
+      action: 'user.delete',
+      targetType: 'user',
+      targetId: id,
+      detail: { target_name: targetUser?.display_name, target_username: targetUser?.username },
+      ipAddress: req.ip,
+    });
+
     res.json({ success: true, data: { message: '用户已删除' } });
   } catch (error) {
     res.status(400).json({

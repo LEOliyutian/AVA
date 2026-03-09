@@ -21,3 +21,5 @@ export { AvalancheMapPage } from './AvalancheMapPage';
 export { QuizHubPage } from './QuizHubPage';
 export { QuizSessionPage } from './QuizSessionPage';
 export { QuizResultPage } from './QuizResultPage';
+export { AdminDashboardPage } from './AdminDashboardPage';
+export { AuditLogPage } from './AuditLogPage';

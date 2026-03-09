@@ -1,0 +1,133 @@
+Claude Code 工程化配置指南
+项目：雪崩预报系统（吉克普林滑雪场）
+仓库：https://github.com/LEOliyutian/AVA
+
+本文档是 Claude Code 的工作依据，描述项目结构、工程规范与 AI 行为约定。
+
+一、项目概览
+
+用途：面向吉克普林滑雪场的雪崩预报与安全管理系统
+架构：前后端分离，前端 SPA + 后端 REST API + SQLite 数据库
+
+前端：React 19 + TypeScript + Vite，端口 5173
+后端：Express 5 + TypeScript + better-sqlite3，端口 3001
+数据库：SQLite（server/data/avalanche.db）
+部署：start.bat / start.sh 一键启动
+
+核心功能模块：
+  - 雪崩预报（Forecast）：预报编辑、发布、详情展示
+  - 气象数据（Weather）：气象站数据录入与看板
+  - 观测记录（Observation）：野外观测数据管理
+  - 雪崩事件（Avalanche Event）：历史事件记录
+  - 用户系统（Auth）：登录、注册、权限控制
+  - 管理后台（Admin）：用户管理、审计日志
+  - 安全教育（Safety）：危险等级、地形指南、急救、测验
+
+
+二、目录结构
+
+src/
+  api/              API 请求层（每模块一个文件）
+    client.ts       axios 实例 + 拦截器
+    forecast.api.ts / weather.api.ts / observation.api.ts
+    auth.api.ts / admin.api.ts
+  pages/            页面组件（每页 .tsx + .css 成对）
+  store/            Zustand 状态管理
+  App.tsx           路由入口
+
+server/src/
+  routes/           Express 路由（每模块一个文件）
+  services/         业务逻辑层
+  config/
+    database.ts     SQLite 连接 + 自动迁移（runMigrations）
+    index.ts        端口 3001、JWT、CORS 配置
+  db/
+    init.ts         数据库初始化脚本
+    *.sql           Schema 定义
+
+.claude/
+  doc.txt           本文件
+  settings.json
+
+start.bat / start.sh    一键启动（前端 + 后端）
+push.bat  / push.sh     一键提交 GitHub
+CLAUDE.md               Claude Code 项目说明
+
+
+三、技术约定
+
+[语言与类型]
+- 全项目 TypeScript，禁止 any（特殊情况需注释）
+- 前后端均 ESM（import/export），不用 require
+
+[前端]
+- 状态：Zustand（不用 Redux / Context 传业务数据）
+- 样式：每页独立 .css，不用内联 style
+- API：统一走 src/api/ 层，页面不直接调 fetch
+- 路由：react-router-dom v7，集中在 App.tsx
+
+[后端]
+- 分层：routes → services → database，不在 routes 写 SQL
+- 数据库：better-sqlite3 同步 API
+- 认证：JWT，放 Authorization header
+- 加字段：在 runMigrations() 用 ALTER TABLE，不改原始 schema
+
+[命名]
+- 文件：kebab-case（forecast.service.ts）
+- 组件：PascalCase（ForecastDashboardPage.tsx）
+- 变量函数：camelCase
+- 数据库字段：snake_case
+
+
+四、Claude Code 行为约定
+
+[动手前]
+1. 先读相关文件，理解现有代码
+2. 新增功能前确认对应 route / service / api 文件是否存在
+3. 数据库加字段用 runMigrations()，不改原始 schema
+
+[写代码]
+- 只改任务涉及的代码，不顺带重构无关内容
+- 不自动加注释、docstring、console.log
+- 不引入新三方库（除非明确要求）
+- 新页面：.tsx + .css 成对创建，在 src/pages/index.ts 导出
+
+[提交]
+- 用 push.bat / push.sh 提交
+- 格式：feat: / fix: / refactor: / docs:
+
+[禁止]
+- 不删现有功能（除非明确要求）
+- 不动 server/data/avalanche.db
+- 不改 .env / 密钥配置
+- 不在页面组件写 SQL 或直接 fetch
+
+
+五、常用命令
+
+启动：双击 start.bat  或  ./start.sh
+手动：cd server && npm run dev   # 后端 :3001
+      npm run dev                  # 前端 :5173
+数据库初始化（首次）：cd server && npm run db:init
+提交：双击 push.bat  或  ./push.sh
+
+前端  http://localhost:5173
+API   http://localhost:3001/api
+
+
+六、未来规划
+
+近期：
+  □ Admin 后台完善（权限分级）
+  □ 审计日志上线
+  □ 气象数据图表
+
+中期：
+  □ Cesium 3D 地形地图 + 雪崩路径标注
+  □ 预报 PDF 导出
+  □ 移动端适配
+
+长期：
+  □ 多站点支持
+  □ 自动气象数据接入
+  □ 历史数据分析与趋势预测

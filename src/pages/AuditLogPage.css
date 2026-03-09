@@ -1,0 +1,208 @@
+.alp-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.alp-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin-bottom: 24px;
+}
+
+/* 筛选栏 */
+.alp-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+  align-items: center;
+}
+
+.alp-filter-select,
+.alp-filter-input {
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #333;
+  background: #fff;
+  outline: none;
+}
+
+.alp-filter-select:focus,
+.alp-filter-input:focus {
+  border-color: #5b9bd5;
+}
+
+.alp-filter-btn {
+  height: 36px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  background: #1a1a2e;
+  color: #fff;
+  transition: opacity 0.2s;
+}
+
+.alp-filter-btn:hover {
+  opacity: 0.85;
+}
+
+.alp-filter-btn--reset {
+  background: #f0f0f0;
+  color: #555;
+}
+
+/* 表格 */
+.alp-table-wrap {
+  overflow-x: auto;
+  border: 1px solid #e8e8e8;
+  border-radius: 10px;
+}
+
+.alp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.alp-table th {
+  background: #f8f9fa;
+  color: #555;
+  font-weight: 600;
+  text-align: left;
+  padding: 12px 14px;
+  border-bottom: 1px solid #e8e8e8;
+  white-space: nowrap;
+}
+
+.alp-table td {
+  padding: 11px 14px;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: top;
+  color: #333;
+}
+
+.alp-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.alp-table tbody tr:hover td {
+  background: #fafafa;
+}
+
+.alp-td-time {
+  white-space: nowrap;
+  color: #888;
+  font-size: 12px;
+}
+
+.alp-td-user {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.alp-td-target {
+  color: #777;
+  white-space: nowrap;
+}
+
+.alp-td-detail {
+  color: #555;
+  max-width: 280px;
+  word-break: break-all;
+  font-size: 12px;
+}
+
+.alp-td-ip {
+  color: #aaa;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+/* 操作徽章 */
+.alp-action-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.alp-action-badge--user {
+  background: #e8f4fd;
+  color: #1a7abf;
+}
+
+.alp-action-badge--forecast {
+  background: #eafaf1;
+  color: #1e8449;
+}
+
+.alp-action-badge--observation {
+  background: #fef9e7;
+  color: #9a7d0a;
+}
+
+.alp-action-badge--settings {
+  background: #fdf2f8;
+  color: #8e44ad;
+}
+
+/* 分页 */
+.alp-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.alp-page-btn {
+  height: 34px;
+  padding: 0 16px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  background: #fff;
+  color: #333;
+  transition: border-color 0.2s;
+}
+
+.alp-page-btn:hover:not(:disabled) {
+  border-color: #5b9bd5;
+  color: #5b9bd5;
+}
+
+.alp-page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.alp-page-info {
+  font-size: 13px;
+  color: #888;
+}
+
+.alp-center {
+  text-align: center;
+  color: #aaa;
+  padding: 48px 0;
+}
+
+.alp-error {
+  color: #e74c3c;
+  padding: 16px;
+  background: #fdf0ef;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}

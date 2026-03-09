@@ -1,5 +1,7 @@
 export { apiClient } from './client';
 export { authApi } from './auth.api';
+export { adminApi } from './admin.api';
+export type { AdminStats, AuditLog, AuditLogResult, SystemSetting, AuditLogQuery } from './admin.api';
 export { forecastApi } from './forecast.api';
 export { observationApi } from './observation.api';
 export { weatherApi } from './weather.api';

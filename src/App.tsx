@@ -27,6 +27,8 @@ import {
   QuizHubPage,
   QuizSessionPage,
   QuizResultPage,
+  AdminDashboardPage,
+  AuditLogPage,
 } from './pages';
 
 function isFullscreenPath(pathname: string): boolean {
@@ -115,6 +117,24 @@ function AppRouterContent() {
         <Route path="/safety/quiz" element={<QuizHubPage />} />
         <Route path="/safety/quiz/session" element={<QuizSessionPage />} />
         <Route path="/safety/quiz/result" element={<QuizResultPage />} />
+
+        {/* Admin routes - requires admin role */}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute requiredRole="admin">
+              <AdminDashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/audit-logs"
+          element={
+            <ProtectedRoute requiredRole="admin">
+              <AuditLogPage />
+            </ProtectedRoute>
+          }
+        />
 
         {/* 404 redirect */}
         <Route path="*" element={<Navigate to="/" replace />} />

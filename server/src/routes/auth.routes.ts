@@ -1,6 +1,7 @@
 import { Router, type Request, type Response } from 'express';
 import { authService } from '../services/auth.service.js';
 import { authenticate } from '../middleware/auth.middleware.js';
+import { auditService } from '../services/audit.service.js';
 import type { LoginRequest, RegisterRequest } from '../types/index.js';
 
 const router = Router();
@@ -66,6 +67,13 @@ router.post('/login', async (req: Request, res: Response) => {
 
     const result = await authService.login(username, password);
 
+    auditService.write({
+      userId: result.user.id,
+      userName: result.user.username,
+      action: 'user.login',
+      ipAddress: req.ip,
+    });
+
     res.json({
       success: true,
       data: result,
@@ -79,9 +87,15 @@ router.post('/login', async (req: Request, res: Response) => {
 });
 
 // POST /api/auth/logout - 用户登出
-router.post('/logout', authenticate, (_req: Request, res: Response) => {
-  // JWT 无状态，客户端删除 token 即可
-  // 如果需要服务端黑名单，可以在这里实现
+router.post('/logout', authenticate, (req: Request, res: Response) => {
+  if (req.user) {
+    auditService.write({
+      userId: req.user.userId,
+      userName: req.user.username,
+      action: 'user.logout',
+      ipAddress: req.ip,
+    });
+  }
   res.json({
     success: true,
     data: { message: '登出成功' },

@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "sqlite": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-sqlite",
+        "D:\\code\\eg\\avalanche-forecast\\server\\data\\avalanche.db"
+      ]
+    }
+  }
+}

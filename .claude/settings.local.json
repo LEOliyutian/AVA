@@ -59,7 +59,12 @@
       "Bash(npx pandoc:*)",
       "Bash(winget install:*)",
       "Bash(unzip:*)",
-      "Bash(/tmp/pandoc-extract/pandoc-3.6.4/pandoc.exe:*)"
+      "Bash(/tmp/pandoc-extract/pandoc-3.6.4/pandoc.exe:*)",
+      "Bash(chmod +x:*)",
+      "Bash(powershell.exe:*)",
+      "Bash(npx:*)",
+      "Bash(npm search:*)",
+      "Bash(npm view:*)"
     ]
   }
 }

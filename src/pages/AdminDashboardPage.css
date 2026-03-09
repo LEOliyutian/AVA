@@ -1,0 +1,221 @@
+.adp-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.adp-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin-bottom: 28px;
+}
+
+.adp-section {
+  margin-bottom: 28px;
+}
+
+.adp-section-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #eee;
+}
+
+/* 概览卡片 */
+.adp-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.adp-stat-card {
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+}
+
+.adp-stat-value {
+  font-size: 36px;
+  font-weight: 700;
+  color: #1a1a2e;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.adp-stat-label {
+  font-size: 13px;
+  color: #666;
+  font-weight: 500;
+}
+
+.adp-stat-sub {
+  font-size: 11px;
+  color: #999;
+  margin-top: 6px;
+}
+
+/* 图表网格 */
+.adp-charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .adp-charts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.adp-chart-box {
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 0;
+}
+
+/* 柱状图（日趋势） */
+.adp-bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 140px;
+  overflow-x: auto;
+  padding-bottom: 24px;
+  position: relative;
+}
+
+.adp-bar-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  min-width: 20px;
+  height: 100%;
+}
+
+.adp-bar {
+  width: 100%;
+  min-height: 2px;
+  border-radius: 3px 3px 0 0;
+  transition: height 0.3s;
+  margin-top: auto;
+}
+
+.adp-bar-label {
+  font-size: 9px;
+  color: #999;
+  margin-top: 4px;
+  white-space: nowrap;
+  transform: rotate(-45deg);
+  transform-origin: top center;
+}
+
+/* 横向条形图 */
+.adp-hbar-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.adp-hbar-item {
+  display: grid;
+  grid-template-columns: 100px 1fr 36px;
+  align-items: center;
+  gap: 10px;
+}
+
+.adp-hbar-label {
+  font-size: 12px;
+  color: #555;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.adp-hbar-track {
+  height: 14px;
+  background: #f0f0f0;
+  border-radius: 7px;
+  overflow: hidden;
+}
+
+.adp-hbar-fill {
+  height: 100%;
+  border-radius: 7px;
+  transition: width 0.4s ease;
+  min-width: 2px;
+}
+
+.adp-hbar-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* 排名列表 */
+.adp-rank-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.adp-rank-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.adp-rank-no {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #ddd;
+  color: #666;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.adp-rank-no--1 { background: #ffd700; color: #7a5c00; }
+.adp-rank-no--2 { background: #c0c0c0; color: #555; }
+.adp-rank-no--3 { background: #cd7f32; color: #fff; }
+
+.adp-rank-name {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.adp-rank-count {
+  font-size: 13px;
+  color: #5b9bd5;
+  font-weight: 600;
+}
+
+.adp-loading,
+.adp-error,
+.adp-empty {
+  text-align: center;
+  padding: 48px;
+  color: #999;
+  font-size: 14px;
+}
+
+.adp-error {
+  color: #e74c3c;
+}
