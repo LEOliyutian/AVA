@@ -1,5 +1,8 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { knowledgeApi, type KnowledgeNote } from '../api/knowledge.api';
 import './CrystalTypesPage.css';
+import './knowledge-shared.css';
 
 /* ──────── 晶体类型数据 ──────── */
 
@@ -200,6 +203,29 @@ const flowArrows: FlowArrow[] = [
 ];
 
 export function CrystalTypesPage() {
+  const [note, setNote] = useState<KnowledgeNote | null>(null);
+  const [contentMap, setContentMap] = useState<Record<string, Record<string, string>>>({});
+
+  useEffect(() => {
+    knowledgeApi.getNote('crystal_types').then((res) => {
+      if (res.success && res.data?.note) setNote(res.data.note);
+    });
+    knowledgeApi.getContent('crystal_types').then((res) => {
+      if (res.success && res.data) setContentMap(res.data.content);
+    });
+  }, []);
+
+  const mergedCrystals = crystals.map((c) => {
+    const ov = contentMap[c.code] ?? {};
+    return {
+      ...c,
+      shape:        ov.shape        || c.shape,
+      formation:    ov.formation    || c.formation,
+      strength:     ov.strength     || c.strength,
+      significance: ov.significance || c.significance,
+    };
+  });
+
   return (
     <div className="taiga-page">
       <main className="taiga-main">
@@ -306,7 +332,7 @@ export function CrystalTypesPage() {
           </div>
           <div className="crystal-section-body">
             <div className="crystal-cards">
-              {crystals.map((c) => (
+              {mergedCrystals.map((c) => (
                 <div key={c.code} className="crystal-card" style={{ '--crystal-color': c.color } as React.CSSProperties}>
                   <div className="crystal-card-header">
                     <div className="crystal-card-symbol" style={{ backgroundColor: c.color }}>
@@ -428,6 +454,16 @@ export function CrystalTypesPage() {
             </div>
           </div>
         </section>
+
+        {note?.content && (
+          <div className="knowledge-local-note">
+            <div className="knowledge-local-note-header">📍 吉克普林本地说明</div>
+            <div
+              className="knowledge-local-note-body"
+              dangerouslySetInnerHTML={{ __html: note.content.replace(/\n/g, '<br>') }}
+            />
+          </div>
+        )}
       </main>
     </div>
   );

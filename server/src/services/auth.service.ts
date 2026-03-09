@@ -140,6 +140,7 @@ export class AuthService {
       display_name: user.display_name,
       role: user.role,
       email: user.email,
+      is_active: user.is_active,
       created_at: user.created_at,
       last_login: user.last_login,
     };

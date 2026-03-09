@@ -60,6 +60,57 @@ export interface AuditLogQuery {
   limit?: number;
 }
 
+export type ForecastStatus = 'draft' | 'pending_review' | 'published' | 'rejected' | 'archived';
+
+export interface PendingForecast {
+  id: number;
+  forecast_date: string;
+  status: ForecastStatus;
+  danger_alp: number;
+  danger_tl: number;
+  danger_btl: number;
+  forecaster_name: string;
+  reject_reason: string | null;
+  created_at: string;
+  published_at: string | null;
+}
+
+export interface AdminUser {
+  id: number;
+  username: string;
+  display_name: string;
+  role: 'admin' | 'forecaster' | 'visitor';
+  email: string | null;
+  is_active: boolean;
+  created_at: string;
+  last_login: string | null;
+}
+
+export interface AdminUserListResult {
+  users: AdminUser[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+export interface CreateUserPayload {
+  username: string;
+  password: string;
+  display_name: string;
+  role: 'admin' | 'forecaster' | 'visitor';
+  email?: string;
+}
+
+export interface UserListQuery {
+  page?: number;
+  limit?: number;
+  role?: string;
+  keyword?: string;
+}
+
 export const adminApi = {
   getStats: () =>
     apiClient.get<AdminStats>('/admin/stats'),
@@ -82,4 +133,28 @@ export const adminApi = {
 
   updateSetting: (key: string, value: string) =>
     apiClient.put<{ message: string }>(`/admin/settings/${key}`, { value }),
+
+  // 预报审核
+  getPendingForecasts: () =>
+    apiClient.get<{ forecasts: PendingForecast[] }>('/admin/pending-forecasts'),
+
+  // 用户管理
+  getUsers: (query: UserListQuery = {}) => {
+    const params = new URLSearchParams();
+    if (query.page) params.set('page', String(query.page));
+    if (query.limit) params.set('limit', String(query.limit));
+    if (query.role) params.set('role', query.role);
+    if (query.keyword) params.set('keyword', query.keyword);
+    const qs = params.toString();
+    return apiClient.get<AdminUserListResult>(`/admin/users${qs ? `?${qs}` : ''}`);
+  },
+
+  createUser: (data: CreateUserPayload) =>
+    apiClient.post<{ id: number; message: string }>('/admin/users', data),
+
+  setUserStatus: (id: number, isActive: boolean) =>
+    apiClient.put<{ message: string }>(`/admin/users/${id}/status`, { is_active: isActive }),
+
+  getUserActivity: (id: number) =>
+    apiClient.get<{ activity: unknown[] }>(`/admin/users/${id}/activity`),
 };

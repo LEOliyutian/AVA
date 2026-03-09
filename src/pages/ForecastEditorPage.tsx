@@ -206,6 +206,41 @@ export function ForecastEditorPage() {
     setTimeout(() => setSaveMessage(''), 3000);
   };
 
+  // 提交审核
+  const handleSubmitForReview = async () => {
+    if (!id) return;
+    if (!window.confirm('确定提交审核？提交后不可再编辑，需等待管理员审核。')) return;
+    setIsSaving(true);
+    setSaveMessage('');
+    setError('');
+    // 先保存当前内容
+    const data = buildForecastData();
+    await forecastApi.update(parseInt(id, 10), data);
+    const res = await forecastApi.submitForReview(parseInt(id, 10));
+    setIsSaving(false);
+    if (res.success) {
+      setSaveMessage('已提交审核');
+      setTimeout(() => navigate('/'), 1500);
+    } else {
+      setError(res.error || '提交失败');
+    }
+  };
+
+  // 驳回后重新提交
+  const handleResubmit = async () => {
+    if (!id) return;
+    if (!window.confirm('确定重新提交审核？')) return;
+    setIsSaving(true);
+    const res = await forecastApi.resubmit(parseInt(id, 10));
+    setIsSaving(false);
+    if (res.success) {
+      setSaveMessage('已重新提交审核');
+      setTimeout(() => navigate('/'), 1500);
+    } else {
+      setError(res.error || '提交失败');
+    }
+  };
+
   // 保存并发布
   const handlePublish = async () => {
     if (!window.confirm('确定要发布此预报吗？')) return;
@@ -269,24 +304,54 @@ export function ForecastEditorPage() {
           {forecast?.status === 'published' && (
             <span className="status-badge status-published">已发布</span>
           )}
+          {forecast?.status === 'pending_review' && (
+            <span className="status-badge status-pending">审核中</span>
+          )}
+          {forecast?.status === 'rejected' && (
+            <span className="status-badge status-rejected">已驳回</span>
+          )}
         </div>
         <div className="toolbar-actions">
           {error && <span className="toolbar-error">{error}</span>}
           {saveMessage && <span className="toolbar-success">{saveMessage}</span>}
-          <button
-            onClick={handleSaveDraft}
-            disabled={isSaving}
-            className="btn btn-outline"
-          >
-            {isSaving ? '保存中...' : '保存草稿'}
-          </button>
-          <button
-            onClick={handlePublish}
-            disabled={isSaving}
-            className="btn btn-primary"
-          >
-            {isSaving ? '处理中...' : '保存并发布'}
-          </button>
+
+          {/* 驳回状态：显示驳回原因 + 重新提交 */}
+          {forecast?.status === 'rejected' && (
+            <>
+              {forecast.reject_reason && (
+                <span className="toolbar-reject-reason">驳回原因：{forecast.reject_reason}</span>
+              )}
+              <button onClick={handleSaveDraft} disabled={isSaving} className="btn btn-outline">
+                {isSaving ? '保存中...' : '保存修改'}
+              </button>
+              <button onClick={handleResubmit} disabled={isSaving} className="btn btn-primary">
+                {isSaving ? '处理中...' : '重新提交审核'}
+              </button>
+            </>
+          )}
+
+          {/* 待审核状态：只读提示 */}
+          {forecast?.status === 'pending_review' && (
+            <span className="toolbar-info">预报正在审核中，不可编辑</span>
+          )}
+
+          {/* 草稿或新建：保存草稿 + 提交/发布 */}
+          {(!forecast || forecast.status === 'draft') && (
+            <>
+              <button onClick={handleSaveDraft} disabled={isSaving} className="btn btn-outline">
+                {isSaving ? '保存中...' : '保存草稿'}
+              </button>
+              {isEditMode ? (
+                <button onClick={handleSubmitForReview} disabled={isSaving} className="btn btn-primary">
+                  {isSaving ? '处理中...' : '提交审核'}
+                </button>
+              ) : (
+                <button onClick={handlePublish} disabled={isSaving} className="btn btn-primary">
+                  {isSaving ? '处理中...' : '保存并发布'}
+                </button>
+              )}
+            </>
+          )}
         </div>
       </div>
 

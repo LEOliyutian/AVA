@@ -1,6 +1,9 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { DANGER_CONFIG } from '../config';
+import { knowledgeApi, type KnowledgeNote } from '../api/knowledge.api';
 import './DangerScalePage.css';
+import './knowledge-shared.css';
 
 interface LevelInfo {
   level: number;
@@ -87,6 +90,31 @@ function getDangerLabel(level: number) {
 }
 
 export function DangerScalePage() {
+  const [note, setNote] = useState<KnowledgeNote | null>(null);
+  const [contentMap, setContentMap] = useState<Record<string, Record<string, string>>>({});
+
+  useEffect(() => {
+    knowledgeApi.getNote('danger_scale').then((res) => {
+      if (res.success && res.data?.note) setNote(res.data.note);
+    });
+    knowledgeApi.getContent('danger_scale').then((res) => {
+      if (res.success && res.data) setContentMap(res.data.content);
+    });
+  }, []);
+
+  // Merge DB content over hardcoded defaults
+  const mergedLevels = levels.map((info) => {
+    const c = contentMap[`level_${info.level}`] ?? {};
+    return {
+      ...info,
+      stability:      c.stability      || info.stability,
+      naturalTrigger: c.naturalTrigger || info.naturalTrigger,
+      humanTrigger:   c.humanTrigger   || info.humanTrigger,
+      activityScope:  c.activityScope  || info.activityScope,
+      terrainAdvice:  c.terrainAdvice  || info.terrainAdvice,
+    };
+  });
+
   return (
     <div className="taiga-page">
       <main className="taiga-main">
@@ -124,7 +152,7 @@ export function DangerScalePage() {
 
         {/* Level cards */}
         <div className="danger-scale-cards">
-          {levels.map((info) => (
+          {mergedLevels.map((info) => (
             <div
               key={info.level}
               className="danger-scale-card"
@@ -195,6 +223,15 @@ export function DangerScalePage() {
             </div>
           </div>
         </div>
+        {note?.content && (
+          <div className="knowledge-local-note">
+            <div className="knowledge-local-note-header">📍 吉克普林本地说明</div>
+            <div
+              className="knowledge-local-note-body"
+              dangerouslySetInnerHTML={{ __html: note.content.replace(/\n/g, '<br>') }}
+            />
+          </div>
+        )}
       </main>
     </div>
   );

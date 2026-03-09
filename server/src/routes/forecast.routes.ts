@@ -186,6 +186,15 @@ router.put('/:id', authenticate, requireForecaster, (req: Request, res: Response
       return;
     }
 
+    // pending_review 状态不允许编辑（等待审核中）
+    if (forecast.status === 'pending_review' && req.user!.role !== 'admin') {
+      res.status(409).json({
+        success: false,
+        error: '预报正在审核中，不可编辑',
+      });
+      return;
+    }
+
     const data = req.body as Partial<CreateForecastRequest>;
     forecastService.updateForecast(id, data);
 
@@ -241,6 +250,180 @@ router.delete('/:id', authenticate, requireAdmin, (req: Request, res: Response) 
     res.status(500).json({
       success: false,
       error: error instanceof Error ? error.message : '删除预报失败',
+    });
+  }
+});
+
+// POST /api/forecasts/:id/submit - 提交审核（forecaster）
+router.post('/:id/submit', authenticate, requireForecaster, (req: Request, res: Response) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id)) {
+      res.status(400).json({ success: false, error: '无效的预报 ID' });
+      return;
+    }
+
+    const forecast = forecastService.getForecastById(id);
+    if (!forecast) {
+      res.status(404).json({ success: false, error: '预报不存在' });
+      return;
+    }
+
+    if (req.user!.role !== 'admin' && forecast.forecaster_id !== req.user!.userId) {
+      res.status(403).json({ success: false, error: '无权操作此预报' });
+      return;
+    }
+
+    const ok = forecastService.submitForReview(id);
+    if (!ok) {
+      res.status(409).json({ success: false, error: '当前状态不允许提交审核（仅 draft 可提交）' });
+      return;
+    }
+
+    auditService.write({
+      userId: req.user!.userId,
+      userName: req.user!.username,
+      action: 'forecast.submit',
+      targetType: 'forecast',
+      targetId: id,
+      ipAddress: req.ip,
+    });
+
+    res.json({ success: true, data: { message: '已提交审核' } });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : '提交审核失败',
+    });
+  }
+});
+
+// POST /api/forecasts/:id/resubmit - 驳回后重新提交（forecaster）
+router.post('/:id/resubmit', authenticate, requireForecaster, (req: Request, res: Response) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id)) {
+      res.status(400).json({ success: false, error: '无效的预报 ID' });
+      return;
+    }
+
+    const forecast = forecastService.getForecastById(id);
+    if (!forecast) {
+      res.status(404).json({ success: false, error: '预报不存在' });
+      return;
+    }
+
+    if (req.user!.role !== 'admin' && forecast.forecaster_id !== req.user!.userId) {
+      res.status(403).json({ success: false, error: '无权操作此预报' });
+      return;
+    }
+
+    const ok = forecastService.resubmitForReview(id);
+    if (!ok) {
+      res.status(409).json({ success: false, error: '当前状态不允许重新提交（仅 rejected 可重新提交）' });
+      return;
+    }
+
+    auditService.write({
+      userId: req.user!.userId,
+      userName: req.user!.username,
+      action: 'forecast.submit',
+      targetType: 'forecast',
+      targetId: id,
+      detail: { resubmit: true },
+      ipAddress: req.ip,
+    });
+
+    res.json({ success: true, data: { message: '已重新提交审核' } });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : '重新提交失败',
+    });
+  }
+});
+
+// POST /api/forecasts/:id/approve - 审核通过（admin）
+router.post('/:id/approve', authenticate, requireAdmin, (req: Request, res: Response) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id)) {
+      res.status(400).json({ success: false, error: '无效的预报 ID' });
+      return;
+    }
+
+    const forecast = forecastService.getForecastById(id);
+    if (!forecast) {
+      res.status(404).json({ success: false, error: '预报不存在' });
+      return;
+    }
+
+    const ok = forecastService.approveForecast(id, req.user!.userId);
+    if (!ok) {
+      res.status(409).json({ success: false, error: '当前状态不允许审核通过（仅 pending_review 可审核）' });
+      return;
+    }
+
+    auditService.write({
+      userId: req.user!.userId,
+      userName: req.user!.username,
+      action: 'forecast.approve',
+      targetType: 'forecast',
+      targetId: id,
+      ipAddress: req.ip,
+    });
+
+    res.json({ success: true, data: { message: '审核通过，已发布' } });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : '审核通过失败',
+    });
+  }
+});
+
+// POST /api/forecasts/:id/reject - 审核驳回（admin）
+router.post('/:id/reject', authenticate, requireAdmin, (req: Request, res: Response) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id)) {
+      res.status(400).json({ success: false, error: '无效的预报 ID' });
+      return;
+    }
+
+    const { reason } = req.body as { reason?: string };
+    if (!reason || reason.trim().length < 10) {
+      res.status(400).json({ success: false, error: '驳回原因不能少于 10 个字符' });
+      return;
+    }
+
+    const forecast = forecastService.getForecastById(id);
+    if (!forecast) {
+      res.status(404).json({ success: false, error: '预报不存在' });
+      return;
+    }
+
+    const ok = forecastService.rejectForecast(id, req.user!.userId, reason.trim());
+    if (!ok) {
+      res.status(409).json({ success: false, error: '当前状态不允许驳回（仅 pending_review 可驳回）' });
+      return;
+    }
+
+    auditService.write({
+      userId: req.user!.userId,
+      userName: req.user!.username,
+      action: 'forecast.reject',
+      targetType: 'forecast',
+      targetId: id,
+      detail: { reason: reason.trim() },
+      ipAddress: req.ip,
+    });
+
+    res.json({ success: true, data: { message: '已驳回' } });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : '驳回失败',
     });
   }
 });

@@ -142,7 +142,7 @@ sync.bat / ./sync.sh
 
 | 命令 | 触发方式 | 用途 |
 |------|---------|------|
-| `/Leo-UI` | `/Leo-UI` | UI/UX 设计师，设计页面或评审界面 |
+| `/ui-designer` | `/ui-designer` | UI/UX 设计师，设计页面或评审界面 |
 | `/pm` | `/pm` 或 `/product-manager` | 产品经理，分析需求或写 PRD |
 | `/be` | `/be` 或 `/backend-engineer` | 后端工程师，设计 API / Schema / 服务层 |
 | `/debug` | `/debug` 或 `/full-stack-debugger` | 全栈调试员，排查 bug |

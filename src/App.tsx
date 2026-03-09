@@ -29,6 +29,11 @@ import {
   QuizResultPage,
   AdminDashboardPage,
   AuditLogPage,
+  AdminLayout,
+  ReviewQueuePage,
+  UserManagePage,
+  SettingsPage,
+  KnowledgeManagePage,
 } from './pages';
 
 function isFullscreenPath(pathname: string): boolean {
@@ -51,7 +56,8 @@ function isAuthPath(pathname: string): boolean {
 
 function AppRouterContent() {
   const location = useLocation();
-  const showHeader = !isEditorPath(location.pathname) && !isAuthPath(location.pathname) && !isFullscreenPath(location.pathname);
+  const isAdminPath = location.pathname.startsWith('/admin');
+  const showHeader = !isEditorPath(location.pathname) && !isAuthPath(location.pathname) && !isFullscreenPath(location.pathname) && !isAdminPath;
 
   return (
     <>
@@ -123,18 +129,18 @@ function AppRouterContent() {
           path="/admin"
           element={
             <ProtectedRoute requiredRole="admin">
-              <AdminDashboardPage />
+              <AdminLayout />
             </ProtectedRoute>
           }
-        />
-        <Route
-          path="/admin/audit-logs"
-          element={
-            <ProtectedRoute requiredRole="admin">
-              <AuditLogPage />
-            </ProtectedRoute>
-          }
-        />
+        >
+          <Route index element={<AdminDashboardPage />} />
+          <Route path="dashboard" element={<AdminDashboardPage />} />
+          <Route path="audit-logs" element={<AuditLogPage />} />
+          <Route path="review" element={<ReviewQueuePage />} />
+          <Route path="users" element={<UserManagePage />} />
+          <Route path="settings" element={<SettingsPage />} />
+          <Route path="knowledge" element={<KnowledgeManagePage />} />
+        </Route>
 
         {/* 404 redirect */}
         <Route path="*" element={<Navigate to="/" replace />} />

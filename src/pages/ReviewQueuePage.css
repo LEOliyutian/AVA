@@ -1,0 +1,271 @@
+.rqp-container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.rqp-header {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.rqp-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.rqp-count {
+  font-size: 13px;
+  color: #888;
+  background: #f0f0f0;
+  padding: 3px 10px;
+  border-radius: 12px;
+}
+
+.rqp-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.rqp-toast {
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  color: #15803d;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.rqp-empty {
+  text-align: center;
+  padding: 64px 24px;
+  color: #999;
+  font-size: 15px;
+}
+
+.rqp-empty-icon {
+  font-size: 48px;
+  color: #5cb85c;
+  margin-bottom: 16px;
+}
+
+/* 审核卡片列表 */
+.rqp-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.rqp-card {
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 12px;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.rqp-card-main {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 28px;
+  align-items: center;
+}
+
+.rqp-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.rqp-field--wide {
+  min-width: 160px;
+}
+
+.rqp-field-label {
+  font-size: 11px;
+  color: #999;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.rqp-field-value {
+  font-size: 14px;
+  color: #222;
+  font-weight: 500;
+}
+
+.rqp-date {
+  font-size: 16px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.rqp-time {
+  font-size: 13px;
+  color: #666;
+  font-variant-numeric: tabular-nums;
+}
+
+.rqp-danger-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.rqp-bands {
+  display: flex;
+  gap: 10px;
+  font-size: 13px;
+  color: #555;
+}
+
+/* 操作按钮区 */
+.rqp-card-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.rqp-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background 0.15s, opacity 0.15s;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.rqp-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.rqp-btn--primary {
+  background: #0ea5e9;
+  color: #fff;
+}
+
+.rqp-btn--primary:hover:not(:disabled) {
+  background: #0284c7;
+}
+
+.rqp-btn--danger {
+  background: #d9534f;
+  color: #fff;
+}
+
+.rqp-btn--danger:hover:not(:disabled) {
+  background: #b91c1c;
+}
+
+.rqp-btn--danger-ghost {
+  background: #fff;
+  border: 1px solid #fca5a5;
+  color: #dc2626;
+}
+
+.rqp-btn--danger-ghost:hover:not(:disabled) {
+  background: #fef2f2;
+}
+
+.rqp-btn--ghost {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  color: #555;
+}
+
+.rqp-btn--ghost:hover:not(:disabled) {
+  background: #f5f5f5;
+}
+
+/* 驳回弹窗 */
+.rqp-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.rqp-modal {
+  background: #fff;
+  border-radius: 14px;
+  padding: 28px 32px;
+  width: 480px;
+  max-width: calc(100vw - 32px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+}
+
+.rqp-modal-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0 0 8px;
+}
+
+.rqp-modal-hint {
+  font-size: 13px;
+  color: #777;
+  margin: 0 0 16px;
+}
+
+.rqp-modal-textarea {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 14px;
+  resize: vertical;
+  font-family: inherit;
+  box-sizing: border-box;
+  color: #222;
+}
+
+.rqp-modal-textarea:focus {
+  outline: none;
+  border-color: #0ea5e9;
+}
+
+.rqp-modal-counter {
+  text-align: right;
+  font-size: 12px;
+  color: #aaa;
+  margin-top: 6px;
+  margin-bottom: 12px;
+}
+
+.rqp-modal-error {
+  color: #b91c1c;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.rqp-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}

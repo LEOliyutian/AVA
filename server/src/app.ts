@@ -12,6 +12,7 @@ import observationRoutes from './routes/observation.routes.js';
 import weatherRoutes from './routes/weather.routes.js';
 import avalancheEventRoutes from './routes/avalanche-event.routes.js';
 import adminRoutes from './routes/admin.routes.js';
+import knowledgeRoutes from './routes/knowledge.routes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -34,9 +35,13 @@ app.use('/api/observations', observationRoutes);
 app.use('/api/weather-observations', weatherRoutes);
 app.use('/api/avalanche-events', avalancheEventRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/knowledge', knowledgeRoutes);
 
-// 静态文件服务：上传的照片
-app.use('/uploads', express.static(path.resolve(__dirname, '../data/uploads')));
+// 静态文件服务：上传的照片（跨域图片加载需覆盖 helmet 的 CORP 头）
+app.use('/uploads', (_req, res, next) => {
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  next();
+}, express.static(path.resolve(__dirname, '../data/uploads')));
 
 // 健康检查
 app.get('/api/health', (_req, res) => {

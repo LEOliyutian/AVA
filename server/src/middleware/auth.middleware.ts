@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { authService } from '../services/auth.service.js';
+import { getDatabase } from '../config/database.js';
 import type { JwtPayload } from '../types/index.js';
 
 // 扩展 Express Request 类型
@@ -27,6 +28,18 @@ export function authenticate(req: Request, res: Response, next: NextFunction): v
 
   try {
     const payload = authService.verifyToken(token);
+
+    // 检查账号是否被禁用
+    const db = getDatabase();
+    const userRow = db.prepare('SELECT is_active FROM users WHERE id = ?').get(payload.userId) as { is_active: number | null } | undefined;
+    if (userRow && userRow.is_active === 0) {
+      res.status(403).json({
+        success: false,
+        error: '账号已被禁用，请联系管理员',
+      });
+      return;
+    }
+
     req.user = payload;
     next();
   } catch {

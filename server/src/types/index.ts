@@ -9,6 +9,7 @@ export interface User {
   display_name: string;
   role: UserRole;
   email: string | null;
+  is_active: boolean;
   created_at: string;
   updated_at: string;
   last_login: string | null;
@@ -21,12 +22,13 @@ export interface SafeUser {
   display_name: string;
   role: UserRole;
   email: string | null;
+  is_active: boolean;
   created_at: string;
   last_login: string | null;
 }
 
 // 预报状态
-export type ForecastStatus = 'draft' | 'published' | 'archived';
+export type ForecastStatus = 'draft' | 'pending_review' | 'published' | 'rejected' | 'archived';
 
 // 趋势方向
 export type TrendDirection = 'increasing' | 'steady' | 'decreasing';
@@ -65,6 +67,10 @@ export interface Forecast {
   snowpack_observation: string | null;
   activity_observation: string | null;
   summary: string | null;
+
+  reviewer_id: number | null;
+  reviewed_at: string | null;
+  reject_reason: string | null;
 
   created_at: string;
   updated_at: string;
@@ -187,6 +193,7 @@ export interface ForecastListItem {
   danger_tl: number;
   danger_btl: number;
   forecaster_name: string;
+  reject_reason: string | null;
   created_at: string;
   published_at: string | null;
 }

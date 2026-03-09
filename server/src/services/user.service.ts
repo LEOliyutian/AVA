@@ -3,26 +3,89 @@ import { getDatabase } from '../config/database.js';
 import { config } from '../config/index.js';
 import type { User, SafeUser, UserRole } from '../types/index.js';
 
+export interface CreateUserData {
+  username: string;
+  password: string;
+  display_name: string;
+  role: UserRole;
+  email?: string;
+}
+
 export class UserService {
-  // 获取所有用户列表
-  getUsers(): SafeUser[] {
+  // 获取所有用户列表（支持分页 + 角色 + 关键词筛选）
+  getUsers(opts: { page?: number; limit?: number; role?: string; keyword?: string } = {}): { data: SafeUser[]; total: number } {
     const db = getDatabase();
-    const users = db.prepare(`
-      SELECT id, username, display_name, role, email, created_at, last_login
-      FROM users
+    const { page = 1, limit = 20, role, keyword } = opts;
+    const offset = (page - 1) * limit;
+
+    const conditions: string[] = [];
+    const params: (string | number)[] = [];
+
+    if (role) {
+      conditions.push('role = ?');
+      params.push(role);
+    }
+    if (keyword) {
+      conditions.push('(username LIKE ? OR display_name LIKE ?)');
+      params.push(`%${keyword}%`, `%${keyword}%`);
+    }
+
+    const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+
+    const total = (db.prepare(`SELECT COUNT(*) as count FROM users ${where}`).get(...params) as { count: number }).count;
+    const data = db.prepare(`
+      SELECT id, username, display_name, role, email, is_active, created_at, last_login
+      FROM users ${where}
       ORDER BY created_at DESC
-    `).all() as SafeUser[];
-    return users;
+      LIMIT ? OFFSET ?
+    `).all(...params, limit, offset) as SafeUser[];
+
+    return { data, total };
   }
 
   // 获取用户详情
   getUserById(id: number): SafeUser | null {
     const db = getDatabase();
     const user = db.prepare(`
-      SELECT id, username, display_name, role, email, created_at, last_login
+      SELECT id, username, display_name, role, email, is_active, created_at, last_login
       FROM users WHERE id = ?
     `).get(id) as SafeUser | undefined;
     return user || null;
+  }
+
+  // 管理员创建用户
+  async createUser(data: CreateUserData): Promise<number> {
+    const db = getDatabase();
+    const existing = db.prepare('SELECT id FROM users WHERE username = ?').get(data.username);
+    if (existing) throw new Error('用户名已存在');
+
+    const hash = await bcrypt.hash(data.password, config.bcrypt.saltRounds);
+    const result = db.prepare(`
+      INSERT INTO users (username, password_hash, display_name, role, email, is_active)
+      VALUES (?, ?, ?, ?, ?, 1)
+    `).run(data.username, hash, data.display_name, data.role, data.email || null);
+    return result.lastInsertRowid as number;
+  }
+
+  // 设置账号启用 / 禁用状态
+  setUserActive(id: number, isActive: boolean): boolean {
+    const db = getDatabase();
+    const result = db.prepare(`
+      UPDATE users SET is_active = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?
+    `).run(isActive ? 1 : 0, id);
+    return result.changes > 0;
+  }
+
+  // 获取某用户操作历史（从 audit_logs 聚合，最近 100 条）
+  getUserActivity(id: number): unknown[] {
+    const db = getDatabase();
+    return db.prepare(`
+      SELECT id, action, target_type, target_id, detail, ip_address, created_at
+      FROM audit_logs
+      WHERE user_id = ?
+      ORDER BY created_at DESC
+      LIMIT 100
+    `).all(id);
   }
 
   // 更新用户角色

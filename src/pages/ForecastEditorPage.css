@@ -101,6 +101,38 @@
   color: #2e7d32;
 }
 
+.status-pending {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.status-rejected {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.toolbar-info {
+  font-size: 13px;
+  color: #c2410c;
+  background: #fff7ed;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.toolbar-reject-reason {
+  font-size: 12px;
+  color: #b91c1c;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  padding: 6px 12px;
+  border-radius: 6px;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .editor-container {
   flex: 1;
   display: flex;

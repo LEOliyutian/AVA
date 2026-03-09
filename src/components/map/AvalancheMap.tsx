@@ -23,7 +23,8 @@ if (USER_TOKEN) {
 // 自定义高精度 DEM（上传到 Cesium Ion 后获得的 Asset ID）
 const CUSTOM_TERRAIN_ASSET_ID = import.meta.env.VITE_CESIUM_TERRAIN_ASSET_ID;
 
-const TIANDITU_TOKEN = import.meta.env.VITE_TIANDITU_TOKEN || '6c99c7793f41fccc4a55600635a2f938';
+const TIANDITU_TOKEN = import.meta.env.VITE_TIANDITU_TOKEN as string | undefined;
+const MAPTILER_TOKEN = import.meta.env.VITE_MAPTILER_TOKEN as string | undefined;
 
 // 吉克普林滑雪场坐标（新疆阿勒泰禾木, GCJ02→WGS84 近似）
 const JIKEPULIN_CENTER = {
@@ -74,6 +75,7 @@ export function AvalancheMap({ observations = [] }: AvalancheMapProps) {
   const eventDataSourceRef = useRef<Cesium.CustomDataSource | null>(null);
   const pitDataSourceRef = useRef<Cesium.CustomDataSource | null>(null);
   const analysisLayerRef = useRef<Cesium.ImageryLayer | null>(null);
+  const hillshadeLayerRef = useRef<Cesium.ImageryLayer | null>(null);
 
   const {
     activeAnalysisLayer,
@@ -109,21 +111,36 @@ export function AvalancheMap({ observations = [] }: AvalancheMapProps) {
 
     // ② 添加底图（默认 ArcGIS 卫星影像）
     const baseLayer = new Cesium.ImageryLayer(
-      createBaseMapProvider('arcgis')
+      createBaseMapProvider('satellite')
     );
     viewer.imageryLayers.add(baseLayer);
     baseLayerRef.current = baseLayer;
 
-    // ③ 叠加天地图中文标注
-    viewer.imageryLayers.add(
-      new Cesium.ImageryLayer(
-        new Cesium.UrlTemplateImageryProvider({
-          url: `https://t{s}.tianditu.gov.cn/cia_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cia&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILECOL={x}&TILEROW={y}&TILEMATRIX={z}&tk=${TIANDITU_TOKEN}`,
-          subdomains: ['0', '1', '2', '3', '4', '5', '6', '7'],
-          maximumLevel: 18,
-        })
-      )
+    // ③ 山影图层（Esri World Hillshade，免费无需 Token）
+    // 叠在卫星底图之上，alpha 0.28 提供地形深度感而不遮蔽影像纹理
+    const hillshadeLayer = new Cesium.ImageryLayer(
+      new Cesium.UrlTemplateImageryProvider({
+        url: 'https://services.arcgisonline.com/arcgis/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}',
+        maximumLevel: 16,
+        credit: 'Esri World Hillshade',
+      }),
+      { alpha: 0.28 }
     );
+    viewer.imageryLayers.add(hillshadeLayer);
+    hillshadeLayerRef.current = hillshadeLayer;
+
+    // ④ 叠加天地图中文标注（需在 .env 中配置 VITE_TIANDITU_TOKEN，否则跳过）
+    if (TIANDITU_TOKEN) {
+      viewer.imageryLayers.add(
+        new Cesium.ImageryLayer(
+          new Cesium.UrlTemplateImageryProvider({
+            url: `https://t{s}.tianditu.gov.cn/cia_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cia&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILECOL={x}&TILEROW={y}&TILEMATRIX={z}&tk=${TIANDITU_TOKEN}`,
+            subdomains: ['0', '1', '2', '3', '4', '5', '6', '7'],
+            maximumLevel: 18,
+          })
+        )
+      );
+    }
 
     // ④ 叠加 OpenSnowMap 雪道/缆车图层
     const skiLayer = new Cesium.ImageryLayer(
@@ -157,18 +174,20 @@ export function AvalancheMap({ observations = [] }: AvalancheMapProps) {
     // 有 MSAA 时关闭 FXAA 避免重复抗锯齿的性能浪费
     viewer.scene.postProcessStages.fxaa.enabled = false;
 
-    // 3. 地形网格精细度：1.5 兼顾质量与性能（默认 2.0，之前 0.75 过于激进）
-    viewer.scene.globe.maximumScreenSpaceError = 1.5;
+    // 3. 地形网格精细度：降到 1.0 获得更细腻的地形（默认 2.0）
+    viewer.scene.globe.maximumScreenSpaceError = 1.0;
 
     // 4. 预加载相邻瓦片，减少缩放/旋转时的空白闪烁
     viewer.scene.globe.preloadSiblings = true;
-    viewer.scene.globe.tileCacheSize = 1000;
+    viewer.scene.globe.preloadAncestors = true;
+    viewer.scene.globe.tileCacheSize = 2000;
 
     // 5. HDR + 更好的光照效果
     viewer.scene.highDynamicRange = true;
 
-    // 6. 提升影像瓦片精细度
-    viewer.scene.globe.imageryMaximumScreenSpaceError = 1.5;
+    // 6. 大气散射 — 关闭地面散射雾气，保持山地细节清晰
+    viewer.scene.globe.showGroundAtmosphere = false;
+    viewer.scene.fog.enabled = false;
 
     // 飞到吉克普林滑雪场（新疆天山），俯视 45° 可直观看到山体起伏
     viewer.camera.flyTo({ ...HOME_VIEW, duration: 2 });
@@ -223,13 +242,12 @@ export function AvalancheMap({ observations = [] }: AvalancheMapProps) {
       analysisLayerRef.current = null;
     }
 
-    // slope 和 aspect 使用预计算 PNG 叠加，其他保持 globe material
-    if (activeAnalysisLayer === 'slope' || activeAnalysisLayer === 'aspect') {
+    if (activeAnalysisLayer === 'slope') {
+      // slope: 优先加载预渲染 PNG，失败则回退 shader
       viewer.scene.globe.material = undefined as unknown as Cesium.Material;
-      const imageName = activeAnalysisLayer === 'slope' ? 'slope.png' : 'aspect.png';
       try {
         const provider = new Cesium.SingleTileImageryProvider({
-          url: `/terrain/${imageName}`,
+          url: '/terrain/slope.png',
           rectangle: Cesium.Rectangle.fromDegrees(
             DEM_BOUNDS.west, DEM_BOUNDS.south,
             DEM_BOUNDS.east, DEM_BOUNDS.north
@@ -239,21 +257,16 @@ export function AvalancheMap({ observations = [] }: AvalancheMapProps) {
         viewer.imageryLayers.add(layer);
         analysisLayerRef.current = layer;
       } catch (err) {
-        console.warn(`加载 ${imageName} 失败，回退到 globe material:`, err);
-        viewer.scene.globe.material = activeAnalysisLayer === 'slope'
-          ? createSlopeMaterial()
-          : createAspectMaterial();
+        console.warn('加载 slope.png 失败，回退到 globe material:', err);
+        viewer.scene.globe.material = createSlopeMaterial();
       }
+    } else if (activeAnalysisLayer === 'aspect') {
+      // aspect: 直接用 GPU shader，分辨率无限，远优于固定尺寸 PNG
+      viewer.scene.globe.material = createAspectMaterial();
     } else {
       switch (activeAnalysisLayer) {
         case 'avalanche-zone':
           viewer.scene.globe.material = createAvalancheZoneMaterial();
-          break;
-        case 'contour':
-          viewer.scene.globe.material = createContourMaterial();
-          break;
-        case 'slope-contour':
-          viewer.scene.globe.material = createSlopeContourMaterial();
           break;
         default:
           viewer.scene.globe.material = undefined as unknown as Cesium.Material;
@@ -463,8 +476,7 @@ export function AvalancheMap({ observations = [] }: AvalancheMapProps) {
 
           // 分析图层激活时：显示地形查询浮窗
           const layer = state.activeAnalysisLayer;
-          const isAnalysisActive = layer === 'slope' || layer === 'aspect' ||
-            layer === 'avalanche-zone' || layer === 'slope-contour';
+          const isAnalysisActive = layer === 'slope' || layer === 'aspect' || layer === 'avalanche-zone';
 
           if (isAnalysisActive) {
             Cesium.sampleTerrainMostDetailed(viewer.terrainProvider, [cartographic])
@@ -688,115 +700,103 @@ function createAvalancheZoneMaterial(): Cesium.Material {
   });
 }
 
-function createContourMaterial(): Cesium.Material {
-  return Cesium.Material.fromType('ElevationContour', {
-    width: 1.5,
-    spacing: 50.0,    // 50m 间距（原 100m），滑雪场尺度更清晰
-    color: Cesium.Color.WHITE.withAlpha(0.9),
-  });
-}
-
-function createSlopeContourMaterial(): Cesium.Material {
-  return new Cesium.Material({
-    fabric: {
-      type: 'SlopeContour',
-      materials: {
-        contourMaterial: {
-          type: 'ElevationContour',
-          uniforms: {
-            spacing: 50.0,    // 50m 间距，与独立等高线图层一致
-            width: 1.5,
-            color: new Cesium.Color(1.0, 1.0, 1.0, 1.0),
-          },
-        },
-        slopeRampMaterial: {
-          type: 'SlopeRamp',
-          uniforms: {
-            image: createSlopeGradientImage(),
-          },
-        },
-      },
-      components: {
-        diffuse: 'mix(slopeRampMaterial.diffuse, contourMaterial.diffuse, contourMaterial.alpha)',
-        alpha: 'max(slopeRampMaterial.alpha, contourMaterial.alpha)',
-      },
-    },
-  });
-}
 
 // === 底图 Provider 工厂 ===
 
 function createBaseMapProvider(baseMap: BaseMap): Cesium.UrlTemplateImageryProvider {
   switch (baseMap) {
-    case 'google':
+    case 'winter':
+      // MapTiler Winter v2 — 冬季主题，雪山白色，含滑雪道
+      return new Cesium.UrlTemplateImageryProvider({
+        url: `https://api.maptiler.com/maps/winter-v2/{z}/{x}/{y}.png?key=${MAPTILER_TOKEN}`,
+        maximumLevel: 20,
+        credit: '(c) MapTiler | (c) OpenStreetMap contributors',
+      });
+    case 'satellite':
+    default:
+      // MapTiler Satellite v2 — 高分辨率卫星影像，覆盖中亚地区质量优于 ArcGIS
+      if (MAPTILER_TOKEN) {
+        return new Cesium.UrlTemplateImageryProvider({
+          url: `https://api.maptiler.com/tiles/satellite-v2/{z}/{x}/{y}.jpg?key=${MAPTILER_TOKEN}`,
+          maximumLevel: 20,
+          credit: '(c) MapTiler',
+        });
+      }
+      // 无 Token 回退
       return new Cesium.UrlTemplateImageryProvider({
         url: 'https://mt{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
         subdomains: ['0', '1', '2', '3'],
         maximumLevel: 20,
-      });
-    case 'tianditu':
-      return new Cesium.UrlTemplateImageryProvider({
-        url: `https://t{s}.tianditu.gov.cn/img_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILECOL={x}&TILEROW={y}&TILEMATRIX={z}&tk=${TIANDITU_TOKEN}`,
-        subdomains: ['0', '1', '2', '3', '4', '5', '6', '7'],
-        maximumLevel: 18,
-      });
-    case 'topo':
-      return new Cesium.UrlTemplateImageryProvider({
-        url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
-        subdomains: ['a', 'b', 'c'],
-        maximumLevel: 17,
-        credit: '(c) OpenTopoMap CC-BY-SA',
-      });
-    case 'arcgis':
-    default:
-      return new Cesium.UrlTemplateImageryProvider({
-        url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-        maximumLevel: 19,
       });
   }
 }
 
 function createSlopeGradientImage(): HTMLCanvasElement {
   const canvas = document.createElement('canvas');
-  canvas.width = 256;
+  canvas.width = 1024;
   canvas.height = 1;
   const ctx = canvas.getContext('2d')!;
-  const g = ctx.createLinearGradient(0, 0, 256, 0);
-  // 坡度色带：针对雪崩评估优化 (角度/90° = canvas位置)
-  // 0-20°: 安全区 (绿色)
-  g.addColorStop(0, 'rgba(120,200,120,0.5)');       // 0° 平地
-  g.addColorStop(0.222, 'rgba(180,220,100,0.6)');    // 20° 低风险
-  // 25-30°: 注意区 (黄色)
-  g.addColorStop(0.278, 'rgba(255,230,0,0.75)');     // 25° 开始关注
-  g.addColorStop(0.333, 'rgba(255,180,0,0.85)');     // 30° 雪崩起始角度
-  // 35-40°: 高危区 (橙→红)
-  g.addColorStop(0.378, 'rgba(255,100,30,0.9)');     // 34° 典型触发角度
-  g.addColorStop(0.389, 'rgba(255,50,30,0.92)');     // 35° 最高频雪崩角度
-  g.addColorStop(0.444, 'rgba(220,20,20,0.92)');     // 40° 高危
-  // 45°+: 极陡区 (紫色，自然释放)
-  g.addColorStop(0.5, 'rgba(180,0,180,0.9)');        // 45° 极陡
-  g.addColorStop(0.667, 'rgba(140,0,140,0.85)');     // 60° 悬崖
-  g.addColorStop(1.0, 'rgba(100,0,120,0.8)');        // 90° 垂直
+  const g = ctx.createLinearGradient(0, 0, 1024, 0);
+  // position = degrees / 90，过渡带半宽 T ≈ 0.6°，避免 GPU 硬边锯齿
+  const p = (deg: number) => deg / 90;
+  const T = 0.006;
+  // 0-24°: 安全区，几乎透明，不干扰卫星底图
+  g.addColorStop(0,             'rgba(60,180,100,0.0)');
+  g.addColorStop(p(20),         'rgba(60,180,100,0.20)');
+  g.addColorStop(p(25) - T,     'rgba(60,180,100,0.28)');
+  // 25-29°: 注意区（黄），硬切入
+  g.addColorStop(p(25) + T,     'rgba(245,197,24,0.65)');
+  g.addColorStop(p(30) - T,     'rgba(245,197,24,0.72)');
+  // 30-34°: 危险区（橙）
+  g.addColorStop(p(30) + T,     'rgba(255,128,0,0.82)');
+  g.addColorStop(p(35) - T,     'rgba(255,72,10,0.87)');
+  // 35-44°: 高危区（红），硬切入，高饱和高不透明
+  g.addColorStop(p(35) + T,     'rgba(220,20,20,0.93)');
+  g.addColorStop(p(45) - T,     'rgba(220,20,20,0.93)');
+  // 45°+: 极陡区（紫），自然释放
+  g.addColorStop(p(45) + T,     'rgba(155,0,200,0.88)');
+  g.addColorStop(p(60),         'rgba(130,0,160,0.85)');
+  g.addColorStop(1.0,           'rgba(100,0,120,0.80)');
   ctx.fillStyle = g;
-  ctx.fillRect(0, 0, 256, 1);
+  ctx.fillRect(0, 0, 1024, 1);
   return canvas;
 }
 
 function createAspectGradientImage(): HTMLCanvasElement {
   const canvas = document.createElement('canvas');
-  canvas.width = 256;
+  canvas.width = 1024;
   canvas.height = 1;
   const ctx = canvas.getContext('2d')!;
-  const g = ctx.createLinearGradient(0, 0, 256, 0);
-  g.addColorStop(0, 'rgba(0,100,255,0.7)');
-  g.addColorStop(0.125, 'rgba(100,200,255,0.7)');
-  g.addColorStop(0.25, 'rgba(240,240,240,0.6)');
-  g.addColorStop(0.375, 'rgba(255,200,150,0.7)');
-  g.addColorStop(0.5, 'rgba(255,140,0,0.7)');
-  g.addColorStop(0.625, 'rgba(160,80,40,0.7)');
-  g.addColorStop(0.75, 'rgba(60,60,60,0.7)');
-  g.addColorStop(0.875, 'rgba(40,60,160,0.7)');
-  g.addColorStop(1.0, 'rgba(0,100,255,0.7)');
+  const g = ctx.createLinearGradient(0, 0, 1024, 0);
+
+  // 8 个方向各占 128px（1/8 = 0.125），方向内部为平色，边界处 ~4px 渐变过渡
+  // 颜色具有雪崩安全语义（冷→暖：深蓝/浅蓝/冰白/金黄/橙红/深红/紫/深蓝紫）
+  const TRANS = 4 / 1024; // 过渡宽度（归一化）
+  const bands: [r: number, g2: number, b: number][] = [
+    [26,  86,  255], // N  冷坡，持续板高风险
+    [66,  170, 255], // NE 次冷坡
+    [200, 230, 255], // E  晨光坡
+    [255, 217, 102], // SE 升温中
+    [255, 98,  0],   // S  热坡，湿雪风险
+    [204, 34,  0],   // SW 最热坡
+    [123, 63,  160], // W  午后坡 + 风力堆积
+    [42,  76,  204], // NW 冷坡 + 风加载
+  ];
+  const A = 0.85;
+  const n = bands.length;
+
+  bands.forEach(([r, g2, b], i) => {
+    const flatStart = i / n + TRANS;
+    const flatEnd   = (i + 1) / n - TRANS;
+    const rgba = `rgba(${r},${g2},${b},${A})`;
+    if (i === 0) g.addColorStop(0, rgba);
+    g.addColorStop(Math.min(flatStart, 1), rgba);
+    g.addColorStop(Math.min(flatEnd,   1), rgba);
+  });
+  // NW 色延伸到末端
+  const [r, g2, b] = bands[n - 1];
+  g.addColorStop(1.0, `rgba(${r},${g2},${b},${A})`);
+
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, 256, 1);
   return canvas;
@@ -804,20 +804,20 @@ function createAspectGradientImage(): HTMLCanvasElement {
 
 function createAvalancheZoneGradientImage(): HTMLCanvasElement {
   const canvas = document.createElement('canvas');
-  canvas.width = 256;
+  canvas.width = 1024;
   canvas.height = 1;
   const ctx = canvas.getContext('2d')!;
-  ctx.clearRect(0, 0, 256, 1);
-  // 雪崩危险区高亮：仅着色 25°-50° 区间
-  const start = Math.floor(256 * 0.278);  // 25°
-  const peak = Math.floor(256 * 0.389);   // 35° (最高频)
-  const end = Math.floor(256 * 0.556);    // 50°
+  ctx.clearRect(0, 0, 1024, 1);
+  // 雪崩危险区高亮：仅着色 25°-50° 区间，区间外完全透明
+  const start = Math.floor(1024 * 0.278);  // 25°
+  const peak  = Math.floor(1024 * 0.389);  // 35° 最高频
+  const end   = Math.floor(1024 * 0.556);  // 50°
   const g = ctx.createLinearGradient(start, 0, end, 0);
-  g.addColorStop(0, 'rgba(255,230,0,0.5)');           // 25° 边缘
-  g.addColorStop((peak - start) / (end - start) * 0.7, 'rgba(255,120,0,0.8)');  // ~32°
-  g.addColorStop((peak - start) / (end - start), 'rgba(255,30,30,0.9)');        // 35° 峰值
-  g.addColorStop(0.85, 'rgba(200,0,100,0.85)');       // ~45°
-  g.addColorStop(1.0, 'rgba(150,0,150,0.7)');         // 50° 边缘
+  g.addColorStop(0,                                   'rgba(255,230,0,0.50)');  // 25° 渐入
+  g.addColorStop((peak - start) / (end - start) * 0.7,'rgba(255,120,0,0.82)'); // ~32°
+  g.addColorStop((peak - start) / (end - start),      'rgba(255,30,30,0.92)'); // 35° 峰值
+  g.addColorStop(0.85,                                'rgba(200,0,100,0.85)'); // ~45°
+  g.addColorStop(1.0,                                 'rgba(150,0,150,0.65)'); // 50° 渐出
   ctx.fillStyle = g;
   ctx.fillRect(start, 0, end - start, 1);
   return canvas;

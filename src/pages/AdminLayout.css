@@ -1,0 +1,136 @@
+.adl-root {
+  display: flex;
+  min-height: 100vh;
+  background: #f0f4f8;
+}
+
+/* ── 左侧导航 ── */
+.adl-nav {
+  width: 220px;
+  flex-shrink: 0;
+  background: #1a1a2e;
+  color: #c8cfe0;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  z-index: 100;
+}
+
+.adl-nav-header {
+  padding: 28px 20px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.adl-logo {
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+
+.adl-logo-sub {
+  font-size: 11px;
+  color: #6b7a99;
+  margin-top: 3px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.adl-nav-list {
+  list-style: none;
+  padding: 12px 10px;
+  margin: 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.adl-nav-list li + li {
+  margin-top: 2px;
+}
+
+.adl-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #8a97b5;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.15s, color 0.15s;
+}
+
+.adl-nav-link:hover {
+  background: rgba(255,255,255,0.06);
+  color: #d0d8ea;
+}
+
+.adl-nav-link--active {
+  background: rgba(14,165,233,0.18);
+  color: #38bdf8;
+}
+
+.adl-nav-icon {
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* 底部用户区 */
+.adl-nav-footer {
+  padding: 16px 16px 20px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.adl-user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.adl-user-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #d0d8ea;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.adl-user-role {
+  font-size: 11px;
+  color: #6b7a99;
+  margin-top: 2px;
+}
+
+.adl-logout-btn {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #8a97b5;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.adl-logout-btn:hover {
+  border-color: rgba(255,255,255,0.35);
+  color: #d0d8ea;
+}
+
+/* ── 内容区 ── */
+.adl-content {
+  flex: 1;
+  margin-left: 220px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}

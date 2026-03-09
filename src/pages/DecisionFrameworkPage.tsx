@@ -1,5 +1,8 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { knowledgeApi, type KnowledgeNote } from '../api/knowledge.api';
 import './DecisionFrameworkPage.css';
+import './knowledge-shared.css';
 
 /* ──────── 三阶段决策模型 ──────── */
 
@@ -158,6 +161,13 @@ const obviousClues = [
 ];
 
 export function DecisionFrameworkPage() {
+  const [note, setNote] = useState<KnowledgeNote | null>(null);
+  useEffect(() => {
+    knowledgeApi.getNote('decision').then((res) => {
+      if (res.success && res.data?.note) setNote(res.data.note);
+    });
+  }, []);
+
   return (
     <div className="taiga-page">
       <main className="taiga-main">
@@ -320,6 +330,16 @@ export function DecisionFrameworkPage() {
             </div>
           </div>
         </section>
+
+        {note?.content && (
+          <div className="knowledge-local-note">
+            <div className="knowledge-local-note-header">📍 吉克普林本地说明</div>
+            <div
+              className="knowledge-local-note-body"
+              dangerouslySetInnerHTML={{ __html: note.content.replace(/\n/g, '<br>') }}
+            />
+          </div>
+        )}
       </main>
     </div>
   );

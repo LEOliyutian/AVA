@@ -23,3 +23,8 @@ export { QuizSessionPage } from './QuizSessionPage';
 export { QuizResultPage } from './QuizResultPage';
 export { AdminDashboardPage } from './AdminDashboardPage';
 export { AuditLogPage } from './AuditLogPage';
+export { AdminLayout } from './AdminLayout';
+export { ReviewQueuePage } from './ReviewQueuePage';
+export { UserManagePage } from './UserManagePage';
+export { SettingsPage } from './SettingsPage';
+export { KnowledgeManagePage } from './KnowledgeManagePage';

@@ -7,11 +7,11 @@ import type { UserRole } from '../types/index.js';
 
 const router = Router();
 
-// GET /api/users - 获取用户列表（仅管理员）
+// GET /api/users - 获取用户列表（仅管理员，简单全量版，推荐用 /api/admin/users 带分页）
 router.get('/', authenticate, requireAdmin, (_req: Request, res: Response) => {
   try {
-    const users = userService.getUsers();
-    res.json({ success: true, data: { users } });
+    const result = userService.getUsers();
+    res.json({ success: true, data: { users: result.data } });
   } catch (error) {
     res.status(500).json({
       success: false,

@@ -1,5 +1,8 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { knowledgeApi, type KnowledgeNote } from '../api/knowledge.api';
 import './RescuePage.css';
+import './knowledge-shared.css';
 
 /* ──────── 救援时间线 ──────── */
 
@@ -328,6 +331,13 @@ const selfRescueTips = [
 ];
 
 export function RescuePage() {
+  const [note, setNote] = useState<KnowledgeNote | null>(null);
+  useEffect(() => {
+    knowledgeApi.getNote('rescue').then((res) => {
+      if (res.success && res.data?.note) setNote(res.data.note);
+    });
+  }, []);
+
   return (
     <div className="taiga-page">
       <main className="taiga-main">
@@ -815,6 +825,16 @@ export function RescuePage() {
             </div>
           </div>
         </section>
+
+        {note?.content && (
+          <div className="knowledge-local-note">
+            <div className="knowledge-local-note-header">📍 吉克普林本地说明</div>
+            <div
+              className="knowledge-local-note-body"
+              dangerouslySetInnerHTML={{ __html: note.content.replace(/\n/g, '<br>') }}
+            />
+          </div>
+        )}
       </main>
     </div>
   );

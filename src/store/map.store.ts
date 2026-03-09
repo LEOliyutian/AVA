@@ -13,8 +13,8 @@ export interface SnowpitLocation {
   gps_coordinates?: string | null;
 }
 
-export type AnalysisLayer = 'none' | 'slope' | 'aspect' | 'avalanche-zone' | 'contour' | 'slope-contour';
-export type BaseMap = 'arcgis' | 'google' | 'tianditu' | 'topo';
+export type AnalysisLayer = 'none' | 'slope' | 'aspect' | 'avalanche-zone';
+export type BaseMap = 'satellite' | 'winter';
 export type EditMode = 'none' | 'add-event' | 'add-snowpit';
 
 interface MapState {
@@ -87,7 +87,7 @@ export type MapStore = MapState & MapActions;
 export const useMapStore = create<MapStore>((set, get) => ({
   // 初始状态
   activeAnalysisLayer: 'none',
-  baseMap: 'arcgis',
+  baseMap: 'satellite',
   showAvalancheEvents: true,
   showSnowPits: true,
   showSkiRuns: true,

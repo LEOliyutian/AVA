@@ -1,13 +1,16 @@
 import { apiClient } from './client';
 
+export type ForecastStatus = 'draft' | 'pending_review' | 'published' | 'rejected' | 'archived';
+
 export interface ForecastListItem {
   id: number;
   forecast_date: string;
-  status: 'draft' | 'published' | 'archived';
+  status: ForecastStatus;
   danger_alp: number;
   danger_tl: number;
   danger_btl: number;
   forecaster_name: string;
+  reject_reason: string | null;
   created_at: string;
   published_at: string | null;
 }
@@ -27,7 +30,10 @@ export interface ForecastDetail {
   forecast_date: string;
   forecaster_id: number;
   forecaster_name: string;
-  status: 'draft' | 'published' | 'archived';
+  status: ForecastStatus;
+  reviewer_id: number | null;
+  reviewed_at: string | null;
+  reject_reason: string | null;
 
   danger_alp: number;
   danger_tl: number;
@@ -151,7 +157,7 @@ export interface CreateForecastRequest {
 export interface ForecastListParams {
   page?: number;
   limit?: number;
-  status?: 'draft' | 'published' | 'archived';
+  status?: ForecastStatus;
   startDate?: string;
   endDate?: string;
 }
@@ -193,5 +199,21 @@ export const forecastApi = {
 
   async publish(id: number) {
     return apiClient.post<{ message: string }>(`/forecasts/${id}/publish`);
+  },
+
+  async submitForReview(id: number) {
+    return apiClient.post<{ message: string }>(`/forecasts/${id}/submit`);
+  },
+
+  async resubmit(id: number) {
+    return apiClient.post<{ message: string }>(`/forecasts/${id}/resubmit`);
+  },
+
+  async approve(id: number) {
+    return apiClient.post<{ message: string }>(`/forecasts/${id}/approve`);
+  },
+
+  async reject(id: number, reason: string) {
+    return apiClient.post<{ message: string }>(`/forecasts/${id}/reject`, { reason });
   },
 };

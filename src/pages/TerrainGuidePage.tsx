@@ -1,5 +1,8 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { knowledgeApi, type KnowledgeNote } from '../api/knowledge.api';
 import './TerrainGuidePage.css';
+import './knowledge-shared.css';
 
 const terrainMatrix = [
   { level: 1, label: '低风险', color: '#5cb85c', suitable: '所有地形', avoid: '无特别限制' },
@@ -10,6 +13,13 @@ const terrainMatrix = [
 ];
 
 export function TerrainGuidePage() {
+  const [note, setNote] = useState<KnowledgeNote | null>(null);
+  useEffect(() => {
+    knowledgeApi.getNote('terrain').then((res) => {
+      if (res.success && res.data?.note) setNote(res.data.note);
+    });
+  }, []);
+
   return (
     <div className="taiga-page">
       <main className="taiga-main">
@@ -225,6 +235,16 @@ export function TerrainGuidePage() {
             </div>
           </div>
         </section>
+
+        {note?.content && (
+          <div className="knowledge-local-note">
+            <div className="knowledge-local-note-header">📍 吉克普林本地说明</div>
+            <div
+              className="knowledge-local-note-body"
+              dangerouslySetInnerHTML={{ __html: note.content.replace(/\n/g, '<br>') }}
+            />
+          </div>
+        )}
       </main>
     </div>
   );

@@ -60,6 +60,80 @@ function runMigrations(database: Database.Database): void {
     database.exec('ALTER TABLE users ADD COLUMN is_active BOOLEAN DEFAULT TRUE');
   }
 
+  // 知识图片表（支持多图、草稿发布）
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS knowledge_media (
+      id           INTEGER PRIMARY KEY AUTOINCREMENT,
+      page_key     VARCHAR(50) NOT NULL,
+      item_key     VARCHAR(50) NOT NULL,
+      file_path    VARCHAR(200) NOT NULL,
+      alt_text     VARCHAR(200),
+      uploaded_by  INTEGER REFERENCES users(id),
+      created_at   DATETIME DEFAULT CURRENT_TIMESTAMP,
+      sort_order   INTEGER DEFAULT 0,
+      is_published INTEGER DEFAULT 0
+    )
+  `);
+
+  // 迁移旧表：移除 UNIQUE(page_key, item_key)，增加 sort_order / is_published
+  const kmCols = database.prepare("PRAGMA table_info(knowledge_media)").all() as { name: string }[];
+  if (kmCols.length > 0 && !kmCols.map(c => c.name).includes('sort_order')) {
+    database.exec(`
+      CREATE TABLE knowledge_media_new (
+        id           INTEGER PRIMARY KEY AUTOINCREMENT,
+        page_key     VARCHAR(50) NOT NULL,
+        item_key     VARCHAR(50) NOT NULL,
+        file_path    VARCHAR(200) NOT NULL,
+        alt_text     VARCHAR(200),
+        uploaded_by  INTEGER REFERENCES users(id),
+        created_at   DATETIME DEFAULT CURRENT_TIMESTAMP,
+        sort_order   INTEGER DEFAULT 0,
+        is_published INTEGER DEFAULT 0
+      )
+    `);
+    database.exec(`
+      INSERT INTO knowledge_media_new
+        (id, page_key, item_key, file_path, alt_text, uploaded_by, created_at, sort_order, is_published)
+      SELECT id, page_key, item_key, file_path, alt_text, uploaded_by, created_at, 0, 1
+      FROM knowledge_media
+    `);
+    database.exec('DROP TABLE knowledge_media');
+    database.exec('ALTER TABLE knowledge_media_new RENAME TO knowledge_media');
+  }
+
+  // 知识本地补充说明表
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS knowledge_notes (
+      page_key    VARCHAR(50) PRIMARY KEY,
+      content     TEXT NOT NULL DEFAULT '',
+      updated_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_by  INTEGER REFERENCES users(id)
+    )
+  `);
+
+  // 知识文字内容表（可覆盖硬编码默认值）
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS knowledge_content (
+      id         INTEGER PRIMARY KEY AUTOINCREMENT,
+      page_key   VARCHAR(50) NOT NULL,
+      item_key   VARCHAR(50) NOT NULL,
+      field_key  VARCHAR(50) NOT NULL,
+      value      TEXT NOT NULL DEFAULT '',
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(page_key, item_key, field_key)
+    )
+  `);
+
+  // knowledge_content / knowledge_notes 新增 is_published 字段
+  const kcCols = database.prepare("PRAGMA table_info(knowledge_content)").all() as { name: string }[];
+  if (kcCols.length > 0 && !kcCols.map(c => c.name).includes('is_published')) {
+    database.exec('ALTER TABLE knowledge_content ADD COLUMN is_published INTEGER DEFAULT 0');
+  }
+  const knCols = database.prepare("PRAGMA table_info(knowledge_notes)").all() as { name: string }[];
+  if (knCols.length > 0 && !knCols.map(c => c.name).includes('is_published')) {
+    database.exec('ALTER TABLE knowledge_notes ADD COLUMN is_published INTEGER DEFAULT 0');
+  }
+
   // 初始化系统配置默认值
   const settingsCount = database.prepare("SELECT COUNT(*) as count FROM system_settings").get() as { count: number };
   if (settingsCount.count === 0) {

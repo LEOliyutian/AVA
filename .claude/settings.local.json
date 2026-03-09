@@ -64,7 +64,10 @@
       "Bash(powershell.exe:*)",
       "Bash(npx:*)",
       "Bash(npm search:*)",
-      "Bash(npm view:*)"
+      "Bash(npm view:*)",
+      "Bash(cp:*)",
+      "Bash(mkdir:*)",
+      "Bash(echo \n\n.problem-type-img-wrap {\n  margin: 12px 0 16px;\n  border-radius: 10px;\n  overflow: hidden;\n  max-height: 280px;\n}\n\n.problem-type-img {\n  width: 100%;\n  height: 100%;\n  object-fit: cover;\n  display: block;\n}\n\n.knowledge-local-note {\n  margin-top: 40px;\n  background: #f0f9ff;\n  border: 1px solid #bae6fd;\n  border-left: 4px solid #0ea5e9;\n  border-radius: 10px;\n  overflow: hidden;\n}\n\n.knowledge-local-note-header {\n  padding: 12px 20px;\n  font-size: 13px;\n  font-weight: 700;\n  color: #0369a1;\n  background: #e0f2fe;\n  letter-spacing: 0.3px;\n}\n\n.knowledge-local-note-body {\n  padding: 16px 20px;\n  font-size: 14px;\n  line-height: 1.75;\n  color: #334155;\n}:*)"
     ]
   }
 }

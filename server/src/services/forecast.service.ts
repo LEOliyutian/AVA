@@ -433,6 +433,79 @@ export class ForecastService {
     return result.changes > 0;
   }
 
+  // 提交审核（draft → pending_review）
+  submitForReview(id: number): boolean {
+    const db = getDatabase();
+    const result = db.prepare(`
+      UPDATE forecasts
+      SET status = 'pending_review', updated_at = CURRENT_TIMESTAMP
+      WHERE id = ? AND status = 'draft'
+    `).run(id);
+    return result.changes > 0;
+  }
+
+  // 审核通过（pending_review → published）
+  approveForecast(id: number, reviewerId: number): boolean {
+    const db = getDatabase();
+    const result = db.prepare(`
+      UPDATE forecasts
+      SET status = 'published',
+          published_at = CURRENT_TIMESTAMP,
+          reviewer_id = ?,
+          reviewed_at = CURRENT_TIMESTAMP,
+          reject_reason = NULL,
+          updated_at = CURRENT_TIMESTAMP
+      WHERE id = ? AND status = 'pending_review'
+    `).run(reviewerId, id);
+    return result.changes > 0;
+  }
+
+  // 审核驳回（pending_review → rejected）
+  rejectForecast(id: number, reviewerId: number, reason: string): boolean {
+    const db = getDatabase();
+    const result = db.prepare(`
+      UPDATE forecasts
+      SET status = 'rejected',
+          reviewer_id = ?,
+          reviewed_at = CURRENT_TIMESTAMP,
+          reject_reason = ?,
+          updated_at = CURRENT_TIMESTAMP
+      WHERE id = ? AND status = 'pending_review'
+    `).run(reviewerId, reason, id);
+    return result.changes > 0;
+  }
+
+  // 驳回后重新提交（rejected → pending_review）
+  resubmitForReview(id: number): boolean {
+    const db = getDatabase();
+    const result = db.prepare(`
+      UPDATE forecasts
+      SET status = 'pending_review',
+          reviewer_id = NULL,
+          reviewed_at = NULL,
+          reject_reason = NULL,
+          updated_at = CURRENT_TIMESTAMP
+      WHERE id = ? AND status = 'rejected'
+    `).run(id);
+    return result.changes > 0;
+  }
+
+  // 获取待审核预报列表
+  getPendingForecasts(): ForecastListItem[] {
+    const db = getDatabase();
+    return db.prepare(`
+      SELECT
+        f.id, f.forecast_date, f.status,
+        f.danger_alp, f.danger_tl, f.danger_btl,
+        f.reject_reason, f.created_at, f.published_at,
+        u.display_name as forecaster_name
+      FROM forecasts f
+      LEFT JOIN users u ON f.forecaster_id = u.id
+      WHERE f.status = 'pending_review'
+      ORDER BY f.created_at ASC
+    `).all() as ForecastListItem[];
+  }
+
   // 获取预报的创建者 ID
   getForecastOwnerId(id: number): number | null {
     const db = getDatabase();
