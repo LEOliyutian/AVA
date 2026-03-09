@@ -129,6 +129,9 @@ cd server && npm run db:init
 
 # 提交
 push.bat / ./push.sh
+
+# 同步 GitHub 最新代码
+sync.bat / ./sync.sh
 ```
 
 访问：前端 `http://localhost:5173` | API `http://localhost:3001/api`
